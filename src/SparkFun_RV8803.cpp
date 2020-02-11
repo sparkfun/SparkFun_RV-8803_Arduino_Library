@@ -69,24 +69,23 @@ RV8803::RV8803( void )
 
 }
 
-boolean RV8803::begin(TwoWire &wirePort)
+bool RV8803::begin(TwoWire &wirePort)
 {
 	_i2cPort = &wirePort;
-
 	return(true);
 }
 
 //12/24 Hour mode are configurable in the library, not the RTC itself
 void RV8803::set12Hour()
 {
-	_isTwelveHour = 12_HOUR_MODE;
+	_isTwelveHour = TWELVE_HOUR_MODE;
 }
 
 //Configure RTC to output 0-23 hours
 //Converts any current hour setting to 24 hour
 void RV8803::set24Hour()
 {
-	_isTwelveHour = 24_HOUR_MODE;
+	_isTwelveHour = TWENTYFOUR_HOUR_MODE;
 }
 
 //Returns true if RTC has been configured for 12 hour mode
@@ -151,7 +150,7 @@ bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8
 	_time[TIME_MINUTES] = DECtoBCD(min);
 	_time[TIME_HOURS] = DECtoBCD(hour);
 	_time[TIME_DATE] = DECtoBCD(date);
-	_time[TIME_DAY] = DECtoBCD(day);
+	_time[TIME_WEEKDAY] = DECtoBCD(day);
 	_time[TIME_MONTH] = DECtoBCD(month);
 	_time[TIME_YEAR] = DECtoBCD(year);
 		
@@ -206,7 +205,7 @@ bool RV8803::setYear(uint8_t value)
 
 bool RV8803::setWeekday(uint8_t value)
 {
-	_time[TIME_DAY] = DECtoBCD(value);
+	_time[TIME_DATE] = DECtoBCD(value);
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
@@ -238,7 +237,7 @@ uint8_t RV8803::getMinutes()
 
 uint8_t RV8803::getHours()
 {
-	uint8_t tempHours = BCDtoDEC(_time[TIME_HOURS])
+	uint8_t tempHours = BCDtoDEC(_time[TIME_HOURS]);
 	if (is12Hour())
 	{
 		if (isPM())
@@ -266,7 +265,7 @@ uint8_t RV8803::getYear()
 
 uint8_t RV8803::getWeekday()
 {
-	return BCDtoDEC(_time[TIME_DAY]);
+	return BCDtoDEC(_time[TIME_WEEKDAY]);
 }
 
 //Takes the time from the last build and uses it as the current time
@@ -290,9 +289,88 @@ bool RV8803::setToCompilerTime()
 	uint16_t m = BUILD_MONTH;
 	uint16_t y = BUILD_YEAR;
 	uint16_t weekday = (d+=m<3?y--:y-2,23*m/9+d+4+y/4-y/100+y/400)%7 + 1;
-	_time[TIME_DAY] = DECtoBCD(weekday);
+	_time[TIME_WEEKDAY] = DECtoBCD(weekday);
 	
 	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV8803::setCalibrationOffset(float ppm)
+{
+	int8_t integerOffset = ppm / 0.2384; //.2384 is ppm/LSB
+	return writeRegister(RV8803_OFFSET, integerOffset);
+}
+
+bool RV8803::toggleEVICalibration(bool eviCalibration)
+{
+	uint8_t value = readRegister(RV8803_EVENT_CONTROL);
+	value &= ~(1 << EVENT_ERST);
+	value |= eviCalibration << EVENT_ERST;
+	return writeRegister(RV8803_EVENT_CONTROL, eviCalibration);
+}
+
+bool RV8803::toggleCountdownTimer(bool timerState)
+{
+	uint8_t value = readRegister(RV8803_EXTENSION);
+	value &= ~(1 << EXTENSION_TE);
+	value |= (timerState << EXTENSION_TE);
+	return writeRegister(RV8803_EXTENSION, value);
+}
+
+bool RV8803::setCountdownTimerFrequency(uint8_t countdownTimerFrequency)
+{
+	uint8_t value = readRegister(RV8803_EXTENSION);
+	value &= ~(3 << EXTENSION_TD);
+	value |= countdownTimerFrequency << EXTENSION_TD;
+	return writeRegister(RV8803_EXTENSION, value);
+}
+
+bool RV8803::setCountdownTimerClockTicks(uint16_t clockTicks)
+{
+	//First handle the upper bit, as we need to preserve the GPX bits
+	uint8_t value = readRegister(RV8803_TIMER_1);
+	value &= ~(0b00001111); //Clear the least significant nibble
+	value |= (clockTicks >> 8);
+	bool returnValue = writeRegister(RV8803_TIMER_1, value);
+	value = clockTicks & 0x00FF;
+	returnValue &= writeRegister(RV8803_TIMER_0, value);
+	return returnValue;
+}
+
+bool RV8803::setClockOutTimerFrequency(uint8_t clockOutTimerFrequency)
+{
+	uint8_t value = readRegister(RV8803_EXTENSION);
+	value &= ~(3 << EXTENSION_FD);
+	value |= clockOutTimerFrequency << EXTENSION_FD;
+	return writeRegister(RV8803_EXTENSION, value);
+}
+
+bool RV8803::setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency)
+{
+	uint8_t value = readRegister(RV8803_EXTENSION);
+	value &= ~(1 << EXTENSION_USEL);
+	value |= timeUpdateFrequency << EXTENSION_USEL;
+	return writeRegister(RV8803_EXTENSION, value);
+}
+
+/********************************
+Set Alarm Mode controls which parts of the time have to match for the alarm to trigger.
+When the RTC matches a given time, make an interrupt fire.
+Setting a bit to 1 means that the RTC does not check if that value matches to trigger the alarm
+********************************/
+void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate)
+{
+	uint8_t value = readRegister(RV8803_MINUTES_ALARM);
+	value &= ~(1 << ALARM_ENABLE_MINUTE); //clear enable bit
+	value |= (1 << ALARM_ENABLE_MINUTE);
+	writeRegister(RV8803_MINUTES_ALARM, value);
+	value = readRegister(RV8803_HOURS_ALARM);
+	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
+	value |= (1 << ALARM_ENABLE_HOUR);
+	writeRegister(RV8803_HOURS_ALARM, value);
+	value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
+	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
+	value |= (1 << ALARM_ENABLE_HOUR);
+	writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
 }
 
 bool RV8803::setAlarmMinute(uint8_t minute)
@@ -344,76 +422,35 @@ INTERRUPT_TIE	3
 INTERRUPT_AIE	2
 INTERRUPT_EIE	1
 *********************************/
-void RV8803::enableInterrupt(uint8_t source)
+bool RV8803::enableInterrupt(uint8_t source)
 {
 	uint8_t value = readRegister(RV8803_CONTROL);
 	value |= (1<<source); //Set the interrupt enable bit
-	writeRegister(RV8803_CONTROL, value);
+	return writeRegister(RV8803_CONTROL, value);
 }
 
-void RV8803::disableInterrupt(uint8_t source)
+bool RV8803::disableInterrupt(uint8_t source)
 {
 	uint8_t value = readRegister(RV8803_CONTROL);
 	value &= ~(1 << source); //Clear the interrupt enable bit
-	writeRegister(RV8803_CONTROL, value);
+	return writeRegister(RV8803_CONTROL, value);
 }
 
-void clearFlagBit(uint8_t flagToClear)
+uint8_t RV8803::getInterruptFlags()
+{
+	return readRegister(RV8803_CONTROL);
+}
+
+bool RV8803::clearAllFlags() //Read the status register to clear the current interrupt flags
+{
+	return writeRegister(RV8803_FLAG, 0b00000000);//Write all 0's to clear all flags
+}
+
+bool RV8803::clearFlag(uint8_t flagToClear)
 {
 	uint8_t value = readRegister(RV8803_FLAG);
-	value &= (1 << flagToClear); //clear everything but enable bit
-	value |= DECtoBCD(hour);
-	return writeRegister(RV8803_HOURS_ALARM, value);
-}
-
-/********************************
-Set Alarm Mode controls which parts of the time have to match for the alarm to trigger.
-When the RTC matches a given time, make an interrupt fire.
-Setting a bit to 1 means that the RTC does not check if that value matches to trigger the alarm
-********************************/
-void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate)
-{
-	uint8_t value = readRegister(RV8803_MINUTES_ALARM);
-	value &= ~(1 << ALARM_ENABLE_MINUTE); //clear enable bit
-	value &= (1 << ALARM_ENABLE_MINUTE);
-	writeRegister(RV8803_MINUTES_ALARM, value);
-	value = readRegister(RV8803_HOURS_ALARM);
-	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
-	value &= (1 << ALARM_ENABLE_HOUR);
-	writeRegister(RV8803_HOURS_ALARM, value);
-	value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
-	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
-	value &= (1 << ALARM_ENABLE_HOUR);
-	writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
-}
-
-
-void RV8803::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool pulse)
-{
-	// Invalid configurations
-	if (duration == 0 || unit > 0b11) {
-		return;
-	}
-
-	// TIMER_VALUE_) and ! are used to control the countdown timer
-
-	// Set timer value
-	/*writeRegister(RV8803_CTDWN_TMR, (duration - 1));
-	writeRegister(RV8803_TMR_INITIAL, (duration - 1));
-
-	// Enable timer
-	uint8_t value = readRegister(RV8803_CTDWN_TMR_CTRL);
-	value &= 0b00011100; // Clear countdown timer bits while preserving ARPT
-	value |= unit; // Set clock frequency
-	value |= (!pulse << CTDWN_TMR_TM_OFFSET);
-	value |= (repeat << CTDWN_TMR_TRPT_OFFSET);
-	value |= (1 << CTDWN_TMR_TE_OFFSET); // Timer enable
-	writeRegister(RV8803_CTDWN_TMR_CTRL, value);*/
-}
-
-void RV8803::clearInterrupts() //Read the status register to clear the current interrupt flags
-{
-	status();
+	value &= ~(1 << flagToClear); //clear everything but enable bit
+	return writeRegister(RV8803_FLAG, value);
 }
 
 uint8_t RV8803::BCDtoDEC(uint8_t val)
@@ -433,13 +470,12 @@ uint8_t RV8803::readRegister(uint8_t addr)
 	_i2cPort->write(addr);
 	_i2cPort->endTransmission();
 
-	_i2cPort->requestFrom(RV8803_ADDR, (uint8_t)1);
-	if (_i2cPort->available()) {
-		return (_i2cPort->read());
-	}
-	else {
-		return (0xFF); //Error
-	}
+    //typecasting the 1 parameter in requestFrom so that the compiler
+    //doesn't give us a warning about multiple candidates
+    if (_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), static_cast<uint8_t>(1)) != 0)
+    {
+        return _i2cPort->read();
+    }
 }
 
 bool RV8803::writeRegister(uint8_t addr, uint8_t val)
@@ -473,7 +509,7 @@ bool RV8803::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)
     if (_i2cPort->endTransmission() != 0)
       return (false); //Error: Sensor did not ack
 
-	_i2cPort->requestFrom(RV8803_ADDR, len);
+	_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), len);
 	for (uint8_t i = 0; i < len; i++)
 	{
 		dest[i] = _i2cPort->read();

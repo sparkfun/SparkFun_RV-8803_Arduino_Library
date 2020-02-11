@@ -16,9 +16,9 @@
     Open the serial monitor at 9600 baud
 */
 
-#include <SparkFun_RV1805.h>
+#include <SparkFun_RV8803.h>
 
-RV1805 rtc;
+RV8803 rtc;
 
 //The below variables control what the date will be set to
 int hund = 50;

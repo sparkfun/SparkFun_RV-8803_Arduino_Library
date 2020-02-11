@@ -29,71 +29,84 @@ Distributed as-is; no warranty is given.
 #include <Wire.h>
 
 //The 7-bit I2C address of the RV8803
-#define RV8803_ADDR						0b1010010
+#define RV8803_ADDR							0b1010010
 
 
 //Register names:
-#define RV8803_RAM						0x07
-#define RV8803_HUNDREDTHS				0x10
-#define RV8803_SECONDS					0x11
-#define RV8803_MINUTES					0x12
-#define RV8803_HOURS					0x13
-#define RV8803_WEEKDAYS					0x14
-#define RV8803_DATE         			0x15
-#define RV8803_MONTHS        			0x16
-#define RV8803_YEARS        			0x17
-#define RV8803_MINUTES_ALARM     		0x18
-#define RV8803_HOURS_ALARM       		0x19
-#define RV8803_WEEKDAYS_DATE_ALARM   	0x1A
-#define RV8803_TIMER_0					0x1B
-#define RV8803_TIMER_1					0x1C
-#define RV8803_EXTENSION				0x1D
-#define RV8803_FLAG						0x1E
-#define RV8803_CONTROL					0x1F
-#define RV8803_HUNDREDTHS_TIMESTAMP		0x20
-#define RV8803_SECONDS_TIMESTAMP		0x21
-#define RV8803_OFFSET					0x2C
-#define RV8803_EVENT_CONTROL			0x2F
+#define RV8803_RAM							0x07
+#define RV8803_HUNDREDTHS					0x10
+#define RV8803_SECONDS						0x11
+#define RV8803_MINUTES						0x12
+#define RV8803_HOURS						0x13
+#define RV8803_WEEKDAYS						0x14
+#define RV8803_DATE         				0x15
+#define RV8803_MONTHS        				0x16
+#define RV8803_YEARS        				0x17
+#define RV8803_MINUTES_ALARM     			0x18
+#define RV8803_HOURS_ALARM       			0x19
+#define RV8803_WEEKDAYS_DATE_ALARM   		0x1A
+#define RV8803_TIMER_0						0x1B
+#define RV8803_TIMER_1						0x1C
+#define RV8803_EXTENSION					0x1D
+#define RV8803_FLAG							0x1E
+#define RV8803_CONTROL						0x1F
+#define RV8803_HUNDREDTHS_TIMESTAMP			0x20
+#define RV8803_SECONDS_TIMESTAMP			0x21
+#define RV8803_OFFSET						0x2C
+#define RV8803_EVENT_CONTROL				0x2F
 
 //Enable Bits for Alarm Registers
-#define ALARM_ENABLE_MINUTE				7
-#define ALARM_ENABLE_HOUR				7
-#define ALARM_ENABLE_WEEKDAY_DATE		7
+#define ALARM_ENABLE_MINUTE					7
+#define ALARM_ENABLE_HOUR					7
+#define ALARM_ENABLE_WEEKDAY_DATE			7
 
 //Extension Register Bits
-#define EXTENSION_TEST					7
-#define EXTENSION_WADA					6
-#define EXTENSION_USEL					5
-#define EXTENSION_TE					4
-#define EXTENSION_FD					2
-#define EXTENSION_TD					0
+#define EXTENSION_TEST						7
+#define EXTENSION_WADA						6
+#define EXTENSION_USEL						5
+#define EXTENSION_TE						4
+#define EXTENSION_FD						2
+#define EXTENSION_TD						0
 
 //Flag Register Bits
-#define FLAG_UF							5
-#define FLAG_TF							4
-#define FLAG_AF							3
-#define FLAG_EVF						2
-#define FLAG_V2F						1
-#define FLAG_V1F						0
+#define FLAG_UF								5
+#define FLAG_TF								4
+#define FLAG_AF								3
+#define FLAG_EVF							2
+#define FLAG_V2F							1
+#define FLAG_V1F							0
 
 //Control Register Bits
-#define CONTROL_UIE						5
-#define CONTROL_TIE						4
-#define CONTROL_AIE						3
-#define CONTROL_EIE						2
-#define CONTROL_RESET					0
+#define CONTROL_UIE							5
+#define CONTROL_TIE							4
+#define CONTROL_AIE							3
+#define CONTROL_EIE							2
+#define CONTROL_RESET						0
 
 //Event Control Bits
-#define EVENT_ECP						7
-#define EVENT_EHL						6
-#define EVENT_ET						5
-#define EVENT_ERST						0
+#define EVENT_ECP							7
+#define EVENT_EHL							6
+#define EVENT_ET							5
+#define EVENT_ERST							0
 
 //Possible Settings
-#define 12_HOUR_MODE					true
-#define 24_HOUR_MODE					false
-#define WEEKDAY_ALARM					false
-#define DATE_ALARM						true
+#define TWELVE_HOUR_MODE					true
+#define TWENTYFOUR_HOUR_MODE				false
+#define WEEKDAY_ALARM						false
+#define DATE_ALARM							true
+#define COUNTDOWN_TIMER_FREQUENCY_4096_HZ	0b00
+#define COUNTDOWN_TIMER_FREQUENCY_60_HZ		0b01
+#define COUNTDOWN_TIMER_FREQUENCY_1_HZ		0b10
+#define COUNTDOWN_TIMER_FREQUENCY_1/60_HZ	0b11
+#define CLOCK_OUT_FREQUENCY_32768_HZ		0b00
+#define CLOCK_OUT_FREQUENCY_1024_HZ			0b01
+#define CLOCK_OUT_FREQUENCY_1_HZ			0b10
+#define COUNTDOWN_TIMER_ON					true
+#define COUNTDOWN_TIMER_OFF					false
+#define TIME_UPDATE_1_SECOND				false
+#define TIME_UPDATE_1_MINUTE				true
+#define ENABLE_EVI_CALIBRATION				true
+#define DISABLE_EVI_CALIBRATION				false
 
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
 
@@ -114,8 +127,18 @@ class RV8803
 	
     RV8803( void );
 
-    boolean begin( TwoWire &wirePort = Wire);
+    bool begin(TwoWire &wirePort = Wire);
+	
+	void set12Hour();
+	void set24Hour();
+	bool is12Hour(); //Returns true if 12hour bit is set
+	bool isPM(); //Returns true if is12Hour and PM bit is set
 
+	char* stringDateUSA(); //Return date in mm-dd-yyyy
+	char* stringDate(); //Return date in dd-mm-yyyy
+	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
+	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss
+	
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
 	bool setTime(uint8_t * time, uint8_t len);
 	bool setSeconds(uint8_t value);
@@ -127,12 +150,8 @@ class RV8803
 	bool setYear(uint8_t value);
 	
 	bool updateTime(); //Update the local array with the RTC registers
-	
-	char* stringDateUSA(); //Return date in mm-dd-yyyy
-	char* stringDate(); //Return date in dd-mm-yyyy
-	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
-	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss
-	
+
+	uint8_t getHundredths();
 	uint8_t getSeconds();
 	uint8_t getMinutes();
 	uint8_t getHours();
@@ -143,24 +162,28 @@ class RV8803
 	
 	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC
 	
-	bool is12Hour(); //Returns true if 12hour bit is set
-	bool isPM(); //Returns true if is12Hour and PM bit is set
-	void set12Hour();
-	void set24Hour();
+	bool setCalibrationOffset(float ppm);
 	
-	uint8_t status(); //Returns the status byte
+	bool toggleEVICalibration(bool eviCalibration);
+	bool toggleCountdownTimer(bool timerState);
+	bool setCountdownTimerClockTicks(uint16_t clockTicks);
+	bool setCountdownTimerFrequency(uint8_t countdownTimerFrequency);
+	bool setClockOutTimerFrequency(uint8_t clockOutTimerFrequency);
 	
-	bool setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
-	bool setAlarm(uint8_t * time, uint8_t len);
-	void setAlarmMode(uint8_t mode); //0 to 7, alarm goes off with match of second, minute, hour, etc
- 	
-	void setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat = true, bool pulse = true);
+	bool setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency);
+	
+	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate); //0 to 7, alarm goes off with match of second, minute, hour, etc
+	bool setAlarmMinute(uint8_t minute);
+	bool setAlarmHour(uint8_t hour);
+	bool setAlarmWeekday(uint8_t weekday);
+	bool setAlarmDate(uint8_t date);
 
-	void enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
-	void disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
-	void enableAlarmInterrupt(); //Use in conjuction with setAlarm and setAlarmMode
+	bool enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
+	bool disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
 	
-	void clearInterrupts();
+	uint8_t getInterruptFlags();
+	bool clearFlag(uint8_t flagToClear);
+	bool clearAllFlags();
 		
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
 	uint8_t BCDtoDEC(uint8_t val); 
