@@ -13,27 +13,27 @@
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
     Plug the RTC into the shield (any port)
-    Open the serial monitor at 9600 baud
+    Open the serial monitor at 115200 baud
 */
 
 #include <SparkFun_RV8803.h>
 
 RV8803 rtc;
 
-//The below variables control what the date will be set to
+//The below variables control what the date and time will be set to
 int sec = 2;
-int minute = 18;
-int hour = 7;
-int date = 25;
-int month = 6;
-int year = 2018;
+int minute = 3;
+int hour = 11;
+int date = 27;
+int month = 2;
+int year = 2020;
 int day = 5;
 
 void setup() {
 
   Wire.begin();
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Read Time from RTC Example");
 
   if (rtc.begin() == false) {

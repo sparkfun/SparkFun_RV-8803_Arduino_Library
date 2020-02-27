@@ -1,19 +1,19 @@
 /*
-  Prints the time from the RV-8803 Real Time Clock
+  Trickle Charging the RV-8803 Real Time Clock
   By: Andy England
   SparkFun Electronics
-  Date: 2/27/2020
+  Date: 2/22/2017
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to print the time fromt he RTC.
+  This example shows how to set the hundredths register through software.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
     Plug the RTC into the shield (any port)
-    Open the serial monitor at 115200 baud
+    Open the serial monitor at 9600 baud
 */
 
 #include <SparkFun_RV8803.h>
@@ -30,24 +30,19 @@ void setup() {
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
-
+  
   Serial.println("RTC online!");
 }
 
 void loop() {
 
-  if (rtc.updateTime() == false) //Updates the time variables from RTC
+  if(Serial.available())
   {
-    Serial.print("RTC failed to update");
+    char resetCharacter = Serial.read();
+    if (resetCharacter == 'r')
+    {
+      rtc.setHundredthsToZero();
+      Serial.println("Hundredths set to :00");
+    }
   }
-
-  String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
-  //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
-  String currentTime = rtc.stringTime(); //Get the time
-
-  Serial.print(currentDate);
-  Serial.print(" ");
-  Serial.println(currentTime);
-
-  delay(1000);
 }

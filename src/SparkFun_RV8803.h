@@ -116,6 +116,9 @@ Distributed as-is; no warranty is given.
 #define EVI_CAPTURE_ENABLE					true
 #define EVI_CAPTURE_DISABLE					false
 
+#define ENABLE								true
+#define DISABLE								false
+
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
 
 enum time_order {
@@ -149,6 +152,7 @@ class RV8803
 	
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
 	bool setTime(uint8_t * time, uint8_t len);
+	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
 	bool setMinutes(uint8_t value);
 	bool setHours(uint8_t value);
@@ -205,11 +209,11 @@ class RV8803
 	bool setAlarmWeekday(uint8_t weekday);
 	bool setAlarmDate(uint8_t date);
 	
-	bool getMinuteAlarmEnable
-	uint8_t setAlarmMinute();
-	uint8_t setAlarmHour();
-	uint8_t setAlarmWeekday();
-	uint8_t setAlarmDate();
+	bool getMinuteAlarmEnable();
+	uint8_t getAlarmMinute();
+	uint8_t getAlarmHour();
+	uint8_t getAlarmWeekday();
+	uint8_t getAlarmDate();
 
 	bool enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
 	bool disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register

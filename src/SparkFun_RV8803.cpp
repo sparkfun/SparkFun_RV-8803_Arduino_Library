@@ -166,6 +166,12 @@ bool RV8803::setTime(uint8_t * time, uint8_t len)
 	return writeMultipleRegisters(RV8803_SECONDS, time, len - 1); //We use length - 1 as that is the length without the read-only hundredths register
 }
 
+bool RV8803::setHundredthsToZero()
+{
+	writeBit(RV8803_CONTROL, CONTROL_RESET, ENABLE);
+	writeBit(RV8803_CONTROL, CONTROL_RESET, DISABLE);
+}
+
 bool RV8803::setSeconds(uint8_t value)
 {
 	_time[TIME_SECONDS] = DECtoBCD(value);
