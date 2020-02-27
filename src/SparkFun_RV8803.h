@@ -50,15 +50,13 @@ Distributed as-is; no warranty is given.
 #define RV8803_EXTENSION					0x1D
 #define RV8803_FLAG							0x1E
 #define RV8803_CONTROL						0x1F
-#define RV8803_HUNDREDTHS_TIMESTAMP			0x20
-#define RV8803_SECONDS_TIMESTAMP			0x21
+#define RV8803_HUNDREDTHS_CAPTURE			0x20
+#define RV8803_SECONDS_CAPTURE				0x21
 #define RV8803_OFFSET						0x2C
 #define RV8803_EVENT_CONTROL				0x2F
 
 //Enable Bits for Alarm Registers
-#define ALARM_ENABLE_MINUTE					7
-#define ALARM_ENABLE_HOUR					7
-#define ALARM_ENABLE_WEEKDAY_DATE			7
+#define ALARM_ENABLE						7
 
 //Extension Register Bits
 #define EXTENSION_TEST						7
@@ -86,7 +84,7 @@ Distributed as-is; no warranty is given.
 //Event Control Bits
 #define EVENT_ECP							7
 #define EVENT_EHL							6
-#define EVENT_ET							5
+#define EVENT_ET							4
 #define EVENT_ERST							0
 
 //Possible Settings
@@ -101,12 +99,22 @@ Distributed as-is; no warranty is given.
 #define CLOCK_OUT_FREQUENCY_32768_HZ		0b00
 #define CLOCK_OUT_FREQUENCY_1024_HZ			0b01
 #define CLOCK_OUT_FREQUENCY_1_HZ			0b10
+
 #define COUNTDOWN_TIMER_ON					true
 #define COUNTDOWN_TIMER_OFF					false
 #define TIME_UPDATE_1_SECOND				false
 #define TIME_UPDATE_1_MINUTE				true
+
 #define ENABLE_EVI_CALIBRATION				true
 #define DISABLE_EVI_CALIBRATION				false
+#define EVI_DEBOUNCE_NONE					0b00
+#define EVI_DEBOUNCE_256HZ					0b01
+#define EVI_DEBOUNCE_64HZ					0b10
+#define EVI_DEBOUNCE_8HZ					0b11
+#define EVI_RISING_EDGE						true
+#define EVI_FALLING_EDGE					false
+#define EVI_CAPTURE_ENABLE					true
+#define EVI_CAPTURE_DISABLE					false
 
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
 
@@ -160,23 +168,48 @@ class RV8803
 	uint8_t getMonth();
 	uint8_t getYear();	
 	
+	uint8_t getHundredthsCapture();
+	uint8_t getSecondsCapture();
+	
 	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC
 	
 	bool setCalibrationOffset(float ppm);
+	float getCalibrationOffset();
 	
-	bool toggleEVICalibration(bool eviCalibration);
-	bool toggleCountdownTimer(bool timerState);
+	bool setEVICalibration(bool eviCalibration);
+	bool setEVIDebounceTime(uint8_t debounceTime);
+	bool setEVIEdgeDetection(bool edge);
+	bool setEVIEventCapture(bool capture);
+	
+	bool getEVICalibration();
+	uint8_t getEVIDebounceTime();
+	bool getEVIEdgeDetection();
+	bool getEVIEventCapture();
+	
+	bool setCountdownTimerEnable(bool timerState);
 	bool setCountdownTimerClockTicks(uint16_t clockTicks);
 	bool setCountdownTimerFrequency(uint8_t countdownTimerFrequency);
 	bool setClockOutTimerFrequency(uint8_t clockOutTimerFrequency);
+		
+	bool getCountdownTimerEnable();
+	uint16_t getCountdownTimerClockTicks();
+	uint8_t getCountdownTimerFrequency();
+	uint8_t getClockOutTimerFrequency();
 	
 	bool setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency);
+	bool getPeriodicTimeUpdateFrequency();
 	
-	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate); //0 to 7, alarm goes off with match of second, minute, hour, etc
+	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate = WEEKDAY_ALARM); //0 to 7, alarm goes off with match of second, minute, hour, etc
 	bool setAlarmMinute(uint8_t minute);
 	bool setAlarmHour(uint8_t hour);
 	bool setAlarmWeekday(uint8_t weekday);
 	bool setAlarmDate(uint8_t date);
+	
+	bool getMinuteAlarmEnable
+	uint8_t setAlarmMinute();
+	uint8_t setAlarmHour();
+	uint8_t setAlarmWeekday();
+	uint8_t setAlarmDate();
 
 	bool enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
 	bool disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
@@ -191,6 +224,11 @@ class RV8803
 
 	void reset(void); //Fully reset RTC to all zeroes
 	
+	
+	bool readBit(uint8_t regAddr, uint8_t bitAddr);
+	uint8_t readTwoBits(uint8_t regAddr, uint8_t bitAddr);
+	bool writeBit(uint8_t regAddr, uint8_t bitAddr, bool bitToWrite);
+	bool writeBit(uint8_t regAddr, uint8_t bitAddr, uint8_t bitToWrite);
     uint8_t readRegister(uint8_t addr);
     bool writeRegister(uint8_t addr, uint8_t val);
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);

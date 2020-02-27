@@ -217,6 +217,18 @@ bool RV8803::updateTime()
 	if (readMultipleRegisters(RV8803_HUNDREDTHS, _time, TIME_ARRAY_LENGTH) == false)
 		return(false); //Something went wrong
 	
+	if (BCDtoDEC(_time[TIME_SECONDS]) == 59) //If seconds are at 59, read again to make sure we didn't accidentally skip a minute
+	{	
+		uint8_t tempTime[TIME_ARRAY_LENGTH];
+		if (readMultipleRegisters(RV8803_HUNDREDTHS, tempTime, TIME_ARRAY_LENGTH) == false)
+		{
+			return(false); //Something went wrong
+		}
+		if (BCDtoDEC(tempTime[TIME_SECONDS]) == 0) //If the reading for seconds changed, then our new data is correct, otherwise, we can leave the old data.
+		{
+			memcpy(_time, tempTime, TIME_ARRAY_LENGTH);
+		}
+	}
 	return true;
 }
 
@@ -253,6 +265,11 @@ uint8_t RV8803::getDate()
 	return BCDtoDEC(_time[TIME_DATE]);
 }
 
+uint8_t RV8803::getWeekday()
+{
+	return BCDtoDEC(_time[TIME_WEEKDAY]);
+}
+
 uint8_t RV8803::getMonth()
 {
 	return BCDtoDEC(_time[TIME_MONTH]);
@@ -263,9 +280,14 @@ uint8_t RV8803::getYear()
 	return BCDtoDEC(_time[TIME_YEAR]);
 }
 
-uint8_t RV8803::getWeekday()
+uint8_t RV8803::getHundredthsCapture()
 {
-	return BCDtoDEC(_time[TIME_WEEKDAY]);
+	return BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE));
+}
+
+uint8_t RV8803::getSecondsCapture()
+{
+	return BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE));
 }
 
 //Takes the time from the last build and uses it as the current time
@@ -297,31 +319,71 @@ bool RV8803::setToCompilerTime()
 bool RV8803::setCalibrationOffset(float ppm)
 {
 	int8_t integerOffset = ppm / 0.2384; //.2384 is ppm/LSB
+	if (integerOffset < 0)
+	{
+		integerOffset += 64;
+	}
 	return writeRegister(RV8803_OFFSET, integerOffset);
 }
 
-bool RV8803::toggleEVICalibration(bool eviCalibration)
+float RV8803:: getCalibrationOffset()
 {
-	uint8_t value = readRegister(RV8803_EVENT_CONTROL);
-	value &= ~(1 << EVENT_ERST);
-	value |= eviCalibration << EVENT_ERST;
-	return writeRegister(RV8803_EVENT_CONTROL, eviCalibration);
+	int8_t value = readRegister(RV8803_OFFSET);
+	if (value > 32)
+	{
+		value -= 64;
+	}
+	return value * .2384;
 }
 
-bool RV8803::toggleCountdownTimer(bool timerState)
+bool RV8803::setEVIDebounceTime(uint8_t debounceTime)
 {
-	uint8_t value = readRegister(RV8803_EXTENSION);
-	value &= ~(1 << EXTENSION_TE);
-	value |= (timerState << EXTENSION_TE);
-	return writeRegister(RV8803_EXTENSION, value);
+	return writeBit(RV8803_EVENT_CONTROL, EVENT_ET, debounceTime);
+}
+
+bool RV8803::setEVICalibration(bool eviCalibration)
+{
+	return writeBit(RV8803_EVENT_CONTROL, EVENT_ERST, eviCalibration);
+}
+
+bool RV8803::setEVIEdgeDetection(bool edge)
+{
+	return writeBit(RV8803_EVENT_CONTROL, EVENT_EHL, edge);
+}
+
+bool RV8803::setEVIEventCapture(bool capture)
+{
+	return writeBit(RV8803_EVENT_CONTROL, EVENT_ECP, capture);
+}
+
+uint8_t RV8803::getEVIDebounceTime()
+{
+	return readTwoBits(RV8803_EVENT_CONTROL, EVENT_ET);
+}
+
+bool RV8803::getEVICalibration()
+{
+	return readBit(RV8803_EVENT_CONTROL, EVENT_ERST);
+}
+
+bool RV8803::getEVIEdgeDetection()
+{
+	return readBit(RV8803_EVENT_CONTROL, EVENT_EHL);
+}
+
+bool RV8803::getEVIEventCapture()
+{
+	return readBit(RV8803_EVENT_CONTROL, EVENT_ECP);
+}
+
+bool RV8803::setCountdownTimerEnable(bool timerState)
+{
+	return writeBit(RV8803_EXTENSION, EXTENSION_TE, timerState);
 }
 
 bool RV8803::setCountdownTimerFrequency(uint8_t countdownTimerFrequency)
 {
-	uint8_t value = readRegister(RV8803_EXTENSION);
-	value &= ~(3 << EXTENSION_TD);
-	value |= countdownTimerFrequency << EXTENSION_TD;
-	return writeRegister(RV8803_EXTENSION, value);
+	return writeBit(RV8803_EXTENSION, EXTENSION_TD, countdownTimerFrequency);
 }
 
 bool RV8803::setCountdownTimerClockTicks(uint16_t clockTicks)
@@ -338,18 +400,39 @@ bool RV8803::setCountdownTimerClockTicks(uint16_t clockTicks)
 
 bool RV8803::setClockOutTimerFrequency(uint8_t clockOutTimerFrequency)
 {
-	uint8_t value = readRegister(RV8803_EXTENSION);
-	value &= ~(3 << EXTENSION_FD);
-	value |= clockOutTimerFrequency << EXTENSION_FD;
-	return writeRegister(RV8803_EXTENSION, value);
+	return writeBit(RV8803_EXTENSION, EXTENSION_FD, clockOutTimerFrequency);
+}
+
+bool RV8803::getCountdownTimerEnable()
+{
+	return readBit(RV8803_EXTENSION, EXTENSION_TE);
+}
+
+uint8_t RV8803::getCountdownTimerFrequency()
+{
+	return readTwoBits(RV8803_EXTENSION, EXTENSION_TD);
+}
+
+uint16_t RV8803::getCountdownTimerClockTicks()
+{
+	uint16_t value = readRegister(RV8803_TIMER_1) << 8;
+	value |= readRegister(RV8803_TIMER_0);
+	return value;
+}
+
+uint8_t RV8803::getClockOutTimerFrequency()
+{
+	return readTwoBits(RV8803_EXTENSION, EXTENSION_FD);
 }
 
 bool RV8803::setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency)
 {
-	uint8_t value = readRegister(RV8803_EXTENSION);
-	value &= ~(1 << EXTENSION_USEL);
-	value |= timeUpdateFrequency << EXTENSION_USEL;
-	return writeRegister(RV8803_EXTENSION, value);
+		return writeBit(RV8803_EXTENSION, EXTENSION_USEL, timeUpdateFrequency);
+}
+
+bool RV8803::getPeriodicTimeUpdateFrequency()
+{	
+	return readBit(RV8803_EXTENSION, EXTENSION_USEL);
 }
 
 /********************************
@@ -359,24 +442,16 @@ Setting a bit to 1 means that the RTC does not check if that value matches to tr
 ********************************/
 void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate)
 {
-	uint8_t value = readRegister(RV8803_MINUTES_ALARM);
-	value &= ~(1 << ALARM_ENABLE_MINUTE); //clear enable bit
-	value |= (1 << ALARM_ENABLE_MINUTE);
-	writeRegister(RV8803_MINUTES_ALARM, value);
-	value = readRegister(RV8803_HOURS_ALARM);
-	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
-	value |= (1 << ALARM_ENABLE_HOUR);
-	writeRegister(RV8803_HOURS_ALARM, value);
-	value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
-	value &= ~(1 << ALARM_ENABLE_HOUR); //clear enable bit
-	value |= (1 << ALARM_ENABLE_HOUR);
-	writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
+	writeBit(RV8803_MINUTES_ALARM, ALARM_ENABLE, minuteAlarm);
+	writeBit(RV8803_HOURS_ALARM, ALARM_ENABLE, hourAlarm);
+	writeBit(RV8803_WEEKDAYS_DATE_ALARM, ALARM_ENABLE, dateAlarm);
+	writeBit(RV8803_EXTENSION, EXTENSION_WADA, weekdayOrDate);
 }
 
 bool RV8803::setAlarmMinute(uint8_t minute)
 {
 	uint8_t value = readRegister(RV8803_MINUTES_ALARM);
-	value &= (1 << ALARM_ENABLE_MINUTE); //clear everything but enable bit
+	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(minute);
 	return writeRegister(RV8803_MINUTES_ALARM, value);
 }
@@ -384,7 +459,7 @@ bool RV8803::setAlarmMinute(uint8_t minute)
 bool RV8803::setAlarmHour(uint8_t hour)
 {
 	uint8_t value = readRegister(RV8803_HOURS_ALARM);
-	value &= (1 << ALARM_ENABLE_HOUR); //clear everything but enable bit
+	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(hour);
 	return writeRegister(RV8803_HOURS_ALARM, value);
 }
@@ -392,7 +467,7 @@ bool RV8803::setAlarmHour(uint8_t hour)
 bool RV8803::setAlarmWeekday(uint8_t weekday)
 {
 	uint8_t value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
-	value &= (1 << ALARM_ENABLE_WEEKDAY_DATE); //clear everything but enable bit
+	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(weekday);
 	bool returnValue = writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
 	value = readRegister(RV8803_EXTENSION);
@@ -405,7 +480,7 @@ bool RV8803::setAlarmWeekday(uint8_t weekday)
 bool RV8803::setAlarmDate(uint8_t date)
 {
 	uint8_t value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
-	value &= (1 << ALARM_ENABLE_WEEKDAY_DATE); //clear everything but enable bit
+	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(date);
 	bool returnValue = writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
 	value = readRegister(RV8803_EXTENSION);
@@ -462,6 +537,31 @@ uint8_t RV8803::BCDtoDEC(uint8_t val)
 uint8_t RV8803::DECtoBCD(uint8_t val)
 {
 	return ( ( val / 10 ) * 0x10 ) + ( val % 10 );
+}
+
+bool RV8803::readBit(uint8_t regAddr, uint8_t bitAddr)
+{
+	return ((readRegister(regAddr) & (1 << bitAddr)) >> bitAddr);
+}
+
+uint8_t RV8803::readTwoBits(uint8_t regAddr, uint8_t bitAddr)
+{
+	return ((readRegister(regAddr) & (3 << bitAddr)) >> bitAddr);
+}
+
+bool RV8803::writeBit(uint8_t regAddr, uint8_t bitAddr, bool bitToWrite)
+{
+	uint8_t value = readRegister(regAddr);
+	value &= ~(1 << bitAddr);
+	value |= bitToWrite << bitAddr;
+	return writeRegister(regAddr, value);
+}
+bool RV8803::writeBit(uint8_t regAddr, uint8_t bitAddr, uint8_t bitToWrite) //If we seean unsigned eight bit, we know we have to write two bits.
+{
+	uint8_t value = readRegister(regAddr);
+	value &= ~(3 << bitAddr);
+	value |= bitToWrite << bitAddr;
+	return writeRegister(regAddr, value);
 }
 
 uint8_t RV8803::readRegister(uint8_t addr)
