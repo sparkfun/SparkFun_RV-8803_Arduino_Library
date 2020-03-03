@@ -1,15 +1,14 @@
 /*
-  Getting the alarm to fire an interrupt on the RV-8803 Real Time Clock
+  Generating a Periodic Interrupt
   By: Andy England
   SparkFun Electronics
-  Date: 2/22/2017
+  Date: 3/3/2020
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to set an alarm and make the RTC generate an interrupt when the clock time matches the alarm time
-  The INT pin will be 3.3V. When the real time matches the alarm time the INT pin will go low.
+  This example shows how to generate a periodic interrupt signal, as well as show you how to calculate the proper set up values for your necessary time.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
@@ -43,11 +42,12 @@ void setup() {
   //As an example, we'll configure a ~3.5 second interrupt. We'll choose 60 Hz as our frequency as we want something longer than 1 second, but still want enough granularity to fire an interrupt at 3.5 seconds, not 3 or 4.
   //Since the resolution for this setting is 15.625 mS per LSB, we'll convert 3.5 seconds to 3500 ms. We'll then simply divide the time we want by the resolution to get the number of clock ticks we need to wait to fire the interrupt
   //3500 / 15.625 = 224 Clock ticks
+  rtc.disableAllInterrupts();
   rtc.setCountdownTimerFrequency(COUNTDOWN_TIMER_FREQUENCY_64_HZ);
   rtc.setCountdownTimerClockTicks(224);
   rtc.enableHardwareInterrupt(TIMER_INTERRUPT);
-  //rtc.disableAllInterrupts(); //Uncomment this line if you've been playing with interrupts elsewhere.
   rtc.setCountdownTimerEnable(ENABLE); //This will start the timer on the last clock tick of the I2C transaction
+  
   lastInterruptTime = millis(); //Change millis() to micros() if you end up using the 4096 Hz counter
 }
 

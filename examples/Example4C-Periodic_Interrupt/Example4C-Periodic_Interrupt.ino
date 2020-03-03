@@ -1,15 +1,14 @@
 /*
-  Getting the alarm to fire an interrupt on the RV-8803 Real Time Clock
+  Getting the alarm to fire a periodic interrupt on the RV-8803 Real Time Clock
   By: Andy England
   SparkFun Electronics
-  Date: 2/22/2017
+  Date: 3/2/2020
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to set an alarm and make the RTC generate an interrupt when the clock time matches the alarm time
-  The INT pin will be 3.3V. When the real time matches the alarm time the INT pin will go low.
+  This example shows how to generate a periodic 1s/1minute interrupt pulse
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
@@ -37,6 +36,7 @@ void setup() {
   {
     Serial.println("RTC online!");
   }
+  
   rtc.disableAllInterrupts();
   rtc.setPeriodicTimeUpdateFrequency(TIME_UPDATE_1_SECOND); //Can also use TIME_UPDATE_1_MINUTE (TIME_UPDATE_1_SECOND = false, TIME_UPDATE_1_MINUTE = true)
   rtc.enableHardwareInterrupt(UPDATE_INTERRUPT); //The update interrupt needs to have the hardware interrupt enabled to function

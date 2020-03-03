@@ -2,7 +2,7 @@
 SparkFun_RV8803.h
 RV8803 Arduino Library
 Andy England @ SparkFun Electronics
-February 5, 2018
+March 3, 2020
 https://github.com/sparkfun/Qwiic_RTC
 
 Resources:
@@ -109,8 +109,8 @@ Distributed as-is; no warranty is given.
 #define EVI_DEBOUNCE_256HZ					0b01
 #define EVI_DEBOUNCE_64HZ					0b10
 #define EVI_DEBOUNCE_8HZ					0b11
-#define EVI_RISING_EDGE						true
-#define EVI_FALLING_EDGE					false
+#define RISING_EDGE							true
+#define FALLING_EDGE						false
 #define EVI_CAPTURE_ENABLE					true
 #define EVI_CAPTURE_DISABLE					false
 
@@ -146,8 +146,9 @@ class RV8803
 	char* stringDateUSA(); //Return date in mm-dd-yyyy
 	char* stringDate(); //Return date in dd-mm-yyyy
 	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
-	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss
-	
+	char* stringTimestamp(); //Return timestamp in hh:mm:ss:hh, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
+	char* stringTime8601(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss
+		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint8_t year);
 	bool setTime(uint8_t * time, uint8_t len);
 	bool setHundredthsToZero();

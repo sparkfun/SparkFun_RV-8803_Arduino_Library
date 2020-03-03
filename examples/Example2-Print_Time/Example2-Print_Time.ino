@@ -8,7 +8,7 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to print the time fromt he RTC.
+  This example shows how to print the time from the RTC.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
@@ -46,7 +46,6 @@ void loop() {
   String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
   //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
   String currentTime = rtc.stringTime(); //Get the time
-  uint8_t hundredths = rtc.getHundredths();
   Serial.print(currentDate);
   Serial.print(" ");
   Serial.println(currentTime);

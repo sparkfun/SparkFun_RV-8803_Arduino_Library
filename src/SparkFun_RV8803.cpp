@@ -2,7 +2,7 @@
 SparkFun_RV8803.h
 RV8803 Arduino Library
 Andy England @ SparkFun Electronics
-February 5, 2018
+March 3, 2020
 https://github.com/sparkfun/Qwiic_RTC
 
 Development environment specifics:
@@ -72,6 +72,13 @@ RV8803::RV8803( void )
 bool RV8803::begin(TwoWire &wirePort)
 {
 	_i2cPort = &wirePort;
+	
+	_i2cPort->beginTransmission(RV8803_ADDR);
+	
+    if (_i2cPort->endTransmission() != 0)
+	{
+      return (false); //Error: Sensor did not ack
+	}
 	return(true);
 }
 
@@ -139,7 +146,28 @@ char* RV8803::stringTime()
 	return(time);
 }
 
-char* RV8803::stringTimeStamp()
+char* RV8803::stringTimestamp()
+{
+	static char time[14]; //Max of hh:mm:ss:hhXM with \0 terminator
+
+	if(is12Hour() == true)
+	{
+		char half = 'A';
+		uint8_t twelveHourCorrection = 0;
+		if(isPM())
+		{
+			half = 'P';
+			twelveHourCorrection = 12;
+		}
+		sprintf(time, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
+	}
+	else
+	sprintf(time, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
+	
+	return(time);
+}
+
+char* RV8803::stringTime8601()
 {
 	static char timeStamp[21]; //Max of yyyy-mm-ddThh:mm:ss with \0 terminator
 

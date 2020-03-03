@@ -1,8 +1,8 @@
 /*
-  Setting time from the RV-1805 Real Time Clock
+  Setting time from the RV-8803 Real Time Clock
   By: Andy England
   SparkFun Electronics
-  Date: 2/22/2017
+  Date: 3/3/2020
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
@@ -34,7 +34,7 @@ void setup() {
   Wire.begin();
 
   Serial.begin(115200);
-  Serial.println("Set Time on RTC RV-8803");
+  Serial.println("Set Time on RTC");
 
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");

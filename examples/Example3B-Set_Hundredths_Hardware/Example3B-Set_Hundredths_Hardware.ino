@@ -1,14 +1,14 @@
 /*
-  Trickle Charging the RV-8803 Real Time Clock
+  Setting Hundredths Register to 0 Using Hardware
   By: Andy England
   SparkFun Electronics
-  Date: 2/22/2017
+  Date: 3/3/2020
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to set the hundredths register through software.
+  This example shows how to set the hundredths register through hardware.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other

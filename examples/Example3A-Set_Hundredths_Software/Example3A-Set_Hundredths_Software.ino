@@ -1,5 +1,5 @@
 /*
-  Trickle Charging the RV-8803 Real Time Clock
+  Set the Hundredths Register to 0 using I2C
   By: Andy England
   SparkFun Electronics
   Date: 2/22/2017
@@ -8,7 +8,7 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to set the hundredths register through software.
+  This example shows how to set the hundredths register through the I2C interface.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other

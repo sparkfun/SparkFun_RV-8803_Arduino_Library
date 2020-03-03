@@ -2,7 +2,7 @@
   Getting the alarm to fire an interrupt on the RV-8803 Real Time Clock
   By: Andy England
   SparkFun Electronics
-  Date: 2/22/2017
+  Date: 3/3/2020
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Feel like supporting our work? Buy a board from SparkFun!
@@ -45,13 +45,13 @@ void setup() {
     Serial.println("Something went wrong, check wiring");
   }
 
+  rtc.disableAllInterrupts();
   rtc.setItemsToMatchForAlarm(MINUTE_ALARM_ENABLE, HOUR_ALARM_ENABLE, WEEKDAY_ALARM_ENABLE, DATE_ALARM_ENABLE); //The alarm interrupt compares the alarm interrupt registers with the current time registers. We must choose which registers we want to compare by setting bits to true or false
   rtc.setAlarmMinute(minuteAlarmValue);
   rtc.setAlarmHour(hourAlarmValue);
   rtc.setAlarmWeekday(weekdayAlarmValue);
   //rtc.setAlarmDate(dateAlarmValue);
-  rtc.disableAllInterrupts();
-  //rtc.enableHardwareInterrupt(ALARM_INTERRUPT); //Uncomment this line if you'd like the Interrupt pin to pull low when the alarm flag goes up.
+  rtc.enableHardwareInterrupt(ALARM_INTERRUPT); //Uncomment this line if you'd like the Interrupt pin to pull low when the alarm flag goes up.
 }
 
 void loop() {
