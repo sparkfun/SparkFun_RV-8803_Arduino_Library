@@ -1,4 +1,4 @@
-/******************************************************************************
+ /******************************************************************************
 SparkFun_RV8803.h
 RV8803 Arduino Library
 Andy England @ SparkFun Electronics
@@ -125,9 +125,13 @@ char* RV8803::stringTime()
 	if(is12Hour() == true)
 	{
 		char half = 'A';
-		if(isPM()) half = 'P';
-		
-		sprintf(time, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
+		uint8_t twelveHourCorrection = 0;
+		if(isPM())
+		{
+			half = 'P';
+			twelveHourCorrection = 12;
+		}
+		sprintf(time, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
 	}
 	else
 	sprintf(time, "%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
@@ -144,17 +148,17 @@ char* RV8803::stringTimeStamp()
 	return(timeStamp);
 }
 
-bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day)
+bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint8_t year)
 {
 	_time[TIME_SECONDS] = DECtoBCD(sec);
 	_time[TIME_MINUTES] = DECtoBCD(min);
 	_time[TIME_HOURS] = DECtoBCD(hour);
 	_time[TIME_DATE] = DECtoBCD(date);
-	_time[TIME_WEEKDAY] = DECtoBCD(day);
+	_time[TIME_WEEKDAY] = 4;//DECtoBCD(day);
 	_time[TIME_MONTH] = DECtoBCD(month);
-	_time[TIME_YEAR] = DECtoBCD(year);
+	_time[TIME_YEAR] = DECtoBCD(year - 2000);
 		
-	return setTime(_time, TIME_ARRAY_LENGTH);
+	return setTime(_time, TIME_ARRAY_LENGTH); //Subtract one as we don't write to the hundredths register
 }
 
 // setTime -- Set time and date/day registers of RV8803 (using data array)
@@ -163,7 +167,7 @@ bool RV8803::setTime(uint8_t * time, uint8_t len)
 	if (len != TIME_ARRAY_LENGTH)
 		return false;
 	
-	return writeMultipleRegisters(RV8803_SECONDS, time, len - 1); //We use length - 1 as that is the length without the read-only hundredths register
+	return writeMultipleRegisters(RV8803_SECONDS, time + 1, len - 1); //We use length - 1 as that is the length without the read-only hundredths register We also point to the second element in the time array as hundredths is read only
 }
 
 bool RV8803::setHundredthsToZero()
@@ -204,7 +208,7 @@ bool RV8803::setMonth(uint8_t value)
 
 bool RV8803::setYear(uint8_t value)
 {
-	_time[TIME_YEAR] = DECtoBCD(value);
+	_time[TIME_YEAR] = DECtoBCD(value - 2000);
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
@@ -446,12 +450,16 @@ Set Alarm Mode controls which parts of the time have to match for the alarm to t
 When the RTC matches a given time, make an interrupt fire.
 Setting a bit to 1 means that the RTC does not check if that value matches to trigger the alarm
 ********************************/
-void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate)
+void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool weekdayAlarm, bool dateAlarm)
 {
-	writeBit(RV8803_MINUTES_ALARM, ALARM_ENABLE, minuteAlarm);
-	writeBit(RV8803_HOURS_ALARM, ALARM_ENABLE, hourAlarm);
-	writeBit(RV8803_WEEKDAYS_DATE_ALARM, ALARM_ENABLE, dateAlarm);
-	writeBit(RV8803_EXTENSION, EXTENSION_WADA, weekdayOrDate);
+	writeBit(RV8803_MINUTES_ALARM, ALARM_ENABLE, !minuteAlarm); //For some reason these bits are active low
+	writeBit(RV8803_HOURS_ALARM, ALARM_ENABLE, !hourAlarm);
+	writeBit(RV8803_WEEKDAYS_DATE_ALARM, ALARM_ENABLE, !weekdayAlarm);
+	writeBit(RV8803_EXTENSION, EXTENSION_WADA, dateAlarm);
+	if (dateAlarm == true)//enabling both weekday and date alarm will default to a date alarm
+	{
+		writeBit(RV8803_WEEKDAYS_DATE_ALARM, ALARM_ENABLE, !dateAlarm);
+	}
 }
 
 bool RV8803::setAlarmMinute(uint8_t minute)
@@ -475,12 +483,8 @@ bool RV8803::setAlarmWeekday(uint8_t weekday)
 	uint8_t value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(weekday);
-	bool returnValue = writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
-	value = readRegister(RV8803_EXTENSION);
-	value &= ~(1 << EXTENSION_WADA);
-	value |= (WEEKDAY_ALARM << EXTENSION_WADA);
-	returnValue &= writeRegister(RV8803_EXTENSION, value);
-	return returnValue;
+	return writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
+
 }
 
 bool RV8803::setAlarmDate(uint8_t date)
@@ -488,12 +492,7 @@ bool RV8803::setAlarmDate(uint8_t date)
 	uint8_t value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(date);
-	bool returnValue = writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
-	value = readRegister(RV8803_EXTENSION);
-	value &= ~(1 << EXTENSION_WADA);
-	value |= (DATE_ALARM << EXTENSION_WADA);
-	returnValue &= writeRegister(RV8803_EXTENSION, value);
-	return returnValue;
+	return writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
 }
 
 /*********************************
@@ -503,34 +502,44 @@ INTERRUPT_TIE	3
 INTERRUPT_AIE	2
 INTERRUPT_EIE	1
 *********************************/
-bool RV8803::enableInterrupt(uint8_t source)
+bool RV8803::enableHardwareInterrupt(uint8_t source)
 {
 	uint8_t value = readRegister(RV8803_CONTROL);
 	value |= (1<<source); //Set the interrupt enable bit
 	return writeRegister(RV8803_CONTROL, value);
 }
 
-bool RV8803::disableInterrupt(uint8_t source)
+bool RV8803::disableHardwareInterrupt(uint8_t source)
 {
 	uint8_t value = readRegister(RV8803_CONTROL);
 	value &= ~(1 << source); //Clear the interrupt enable bit
 	return writeRegister(RV8803_CONTROL, value);
 }
 
-uint8_t RV8803::getInterruptFlags()
+bool RV8803::disableAllInterrupts()
 {
-	return readRegister(RV8803_CONTROL);
+	uint8_t value = readRegister(RV8803_CONTROL);
+	value &= 1; //Clear all bits except for Reset
+	return writeRegister(RV8803_CONTROL, value);
 }
 
-bool RV8803::clearAllFlags() //Read the status register to clear the current interrupt flags
+bool RV8803::getInterruptFlag(uint8_t flagToGet)
+{
+	uint8_t flag = readRegister(RV8803_FLAG);
+	flag &= (1 << flagToGet);
+	flag = flag >> flagToGet;
+	return flag;
+}
+
+bool RV8803::clearAllInterruptFlags() //Read the status register to clear the current interrupt flags
 {
 	return writeRegister(RV8803_FLAG, 0b00000000);//Write all 0's to clear all flags
 }
 
-bool RV8803::clearFlag(uint8_t flagToClear)
+bool RV8803::clearInterruptFlag(uint8_t flagToClear)
 {
 	uint8_t value = readRegister(RV8803_FLAG);
-	value &= ~(1 << flagToClear); //clear everything but enable bit
+	value &= ~(1 << flagToClear); //clear flag
 	return writeRegister(RV8803_FLAG, value);
 }
 

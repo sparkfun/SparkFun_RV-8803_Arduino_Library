@@ -22,36 +22,40 @@ RV8803 rtc;
 
 //The below variables control what the date and time will be set to
 int sec = 2;
-int minute = 3;
-int hour = 11;
-int date = 27;
-int month = 2;
+int minute = 47;
+int hour = 14; //Set things in 24 hour mode
+int date = 2;
+int month = 3;
 int year = 2020;
-int day = 5;
+int weekday = 2;
 
 void setup() {
 
   Wire.begin();
 
   Serial.begin(115200);
-  Serial.println("Read Time from RTC Example");
+  Serial.println("Set Time on RTC RV-8803");
 
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
+  else
+  {
+    Serial.println("RTC online!");
+  }
 
   //Use the time from the Arduino compiler (build time) to set the RTC
   //Keep in mind that Arduino does not get the new compiler time every time it compiles. to ensure the proper time is loaded, open up a fresh version of the IDE and load the sketch.
+  //Also note that due to upload times, compiler time may be a little bit off on seconds/hundredths
   if (rtc.setToCompilerTime() == false) {
     Serial.println("Something went wrong setting the time");
   }
-  
+
   //Uncomment the below code to set the RTC to your own time
-  /*if (rtc.setTime(sec, minute, hour, date, month, year, day) == false) {
+  /*if (rtc.setTime(sec, minute, hour, weekday, date, month, year) == false) {
     Serial.println("Something went wrong setting the time");
-  }*/
-  
-  Serial.println("RTC online!");
+    }*/
+
 }
 
 void loop() {

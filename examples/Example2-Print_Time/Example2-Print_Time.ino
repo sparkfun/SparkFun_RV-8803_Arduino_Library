@@ -30,8 +30,10 @@ void setup() {
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
-
-  Serial.println("RTC online!");
+  else
+  {
+    Serial.println("RTC online!");
+  }
 }
 
 void loop() {
@@ -44,7 +46,7 @@ void loop() {
   String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
   //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
   String currentTime = rtc.stringTime(); //Get the time
-
+  uint8_t hundredths = rtc.getHundredths();
   Serial.print(currentDate);
   Serial.print(" ");
   Serial.println(currentTime);

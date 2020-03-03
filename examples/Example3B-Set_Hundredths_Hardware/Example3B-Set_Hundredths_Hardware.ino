@@ -20,31 +20,44 @@
 
 RV8803 rtc;
 
+#define EVI_TRIGGER_PIN 13 //If you have a 3.3V microcontroller or a logic level converter, you can connect this pin to trigger the reset of the hundredths register
+
 void setup() {
 
   Wire.begin();
 
   Serial.begin(115200);
-  Serial.println("Read Time from RTC Example");
+  Serial.println("Set Hundredths using Hardware");
 
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
+  else
+  {
+    Serial.println("RTC online!");
+  }
+
+  rtc.disableHardwareInterrupt(EVI_INTERRUPT); //Disbale the interrupt so we don't accidentally cause any based on this
+  rtc.setEVICalibration(ENABLE); //Set's the RTC to reset the hundredths register on button press, or an external event. Must be run before the external event that you want to capture occurs.
   
-  rtc.setEVICalibration(ENABLE); //Set's the RTC to reset the hundredths register on button press
-  
-  Serial.println("RTC online!");
+  pinMode(EVI_TRIGGER_PIN, OUTPUT);
+  digitalWrite(EVI_TRIGGER_PIN, HIGH); //Only write the pin HIGH if you are using a 3.3V microcontroller
+  Serial.println("Ready for button press or external event");
 }
 
 void loop() {
-
-  if(Serial.available()) //The microcontroller waits for an 'r' to reset the hundredths register to :00
+  if (Serial.available()) //The 3.3V microcontroller waits for an 'r' to pull the pin to reset the hundredths register to :00
   {
     char resetCharacter = Serial.read();
     if (resetCharacter == 'r')
     {
-      rtc.setHundredthsToZero(); //This function resets the hundredths register to :00. Note that you can call this based on any event.
-      Serial.println("Hundredths set to :00");
+      digitalWrite(EVI_TRIGGER_PIN, LOW); //The EVI pin is active low, this also clears the EVI calibration bit, so you will need to reset that bit before you try to reset hundredths using hardware again.
+      rtc.updateTime(); //Grab time data from the RTC 
+      uint8_t hundredths = rtc.getHundredths();
+      Serial.print("Hundredths set to :");
+      Serial.println(hundredths);
+      delay(10);
+      digitalWrite(EVI_TRIGGER_PIN, HIGH);
     }
   }
 }

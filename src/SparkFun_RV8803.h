@@ -29,7 +29,7 @@ Distributed as-is; no warranty is given.
 #include <Wire.h>
 
 //The 7-bit I2C address of the RV8803
-#define RV8803_ADDR							0b1010010
+#define RV8803_ADDR							0x32
 
 
 //Register names:
@@ -67,18 +67,18 @@ Distributed as-is; no warranty is given.
 #define EXTENSION_TD						0
 
 //Flag Register Bits
-#define FLAG_UF								5
-#define FLAG_TF								4
-#define FLAG_AF								3
-#define FLAG_EVF							2
+#define FLAG_UPDATE							5
+#define FLAG_TIMER							4
+#define FLAG_ALARM							3
+#define FLAG_EVI							2
 #define FLAG_V2F							1
 #define FLAG_V1F							0
 
-//Control Register Bits
-#define CONTROL_UIE							5
-#define CONTROL_TIE							4
-#define CONTROL_AIE							3
-#define CONTROL_EIE							2
+//Interrupt Control Register Bits
+#define UPDATE_INTERRUPT					5
+#define TIMER_INTERRUPT						4
+#define ALARM_INTERRUPT						3 //
+#define EVI_INTERRUPT						2 //External Event Interrupt
 #define CONTROL_RESET						0
 
 //Event Control Bits
@@ -90,10 +90,8 @@ Distributed as-is; no warranty is given.
 //Possible Settings
 #define TWELVE_HOUR_MODE					true
 #define TWENTYFOUR_HOUR_MODE				false
-#define WEEKDAY_ALARM						false
-#define DATE_ALARM							true
 #define COUNTDOWN_TIMER_FREQUENCY_4096_HZ	0b00
-#define COUNTDOWN_TIMER_FREQUENCY_60_HZ		0b01
+#define COUNTDOWN_TIMER_FREQUENCY_64_HZ		0b01
 #define COUNTDOWN_TIMER_FREQUENCY_1_HZ		0b10
 #define COUNTDOWN_TIMER_FREQUENCY_1/60_HZ	0b11
 #define CLOCK_OUT_FREQUENCY_32768_HZ		0b00
@@ -150,7 +148,7 @@ class RV8803
 	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
 	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss
 	
-	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
+	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint8_t year);
 	bool setTime(uint8_t * time, uint8_t len);
 	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
@@ -190,9 +188,10 @@ class RV8803
 	bool getEVIEdgeDetection();
 	bool getEVIEventCapture();
 	
-	bool setCountdownTimerEnable(bool timerState);
+	bool setCountdownTimerEnable(bool timerState); //Starts and stops our countdown timer
 	bool setCountdownTimerClockTicks(uint16_t clockTicks);
 	bool setCountdownTimerFrequency(uint8_t countdownTimerFrequency);
+	
 	bool setClockOutTimerFrequency(uint8_t clockOutTimerFrequency);
 		
 	bool getCountdownTimerEnable();
@@ -203,7 +202,7 @@ class RV8803
 	bool setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency);
 	bool getPeriodicTimeUpdateFrequency();
 	
-	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool dateAlarm, bool weekdayOrDate = WEEKDAY_ALARM); //0 to 7, alarm goes off with match of second, minute, hour, etc
+	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool weekdayAlarm, bool dateAlarm); //0 to 7, alarm goes off with match of second, minute, hour, etc
 	bool setAlarmMinute(uint8_t minute);
 	bool setAlarmHour(uint8_t hour);
 	bool setAlarmWeekday(uint8_t weekday);
@@ -215,20 +214,18 @@ class RV8803
 	uint8_t getAlarmWeekday();
 	uint8_t getAlarmDate();
 
-	bool enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
-	bool disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
+	bool enableHardwareInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
+	bool disableHardwareInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
+	bool disableAllInterrupts();
 	
-	uint8_t getInterruptFlags();
-	bool clearFlag(uint8_t flagToClear);
-	bool clearAllFlags();
+	bool getInterruptFlag(uint8_t flagToGet);
+	bool clearInterruptFlag(uint8_t flagToClear);
+	bool clearAllInterruptFlags();
 		
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
 	uint8_t BCDtoDEC(uint8_t val); 
 	uint8_t DECtoBCD(uint8_t val);
 
-	void reset(void); //Fully reset RTC to all zeroes
-	
-	
 	bool readBit(uint8_t regAddr, uint8_t bitAddr);
 	uint8_t readTwoBits(uint8_t regAddr, uint8_t bitAddr);
 	bool writeBit(uint8_t regAddr, uint8_t bitAddr, bool bitToWrite);
