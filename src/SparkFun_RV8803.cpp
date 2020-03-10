@@ -82,32 +82,38 @@ bool RV8803::begin(TwoWire &wirePort)
 	return(true);
 }
 
-//12/24 Hour mode are configurable in the library, not the RTC itself
+//Configures the microcontroller to convert to 12 hour mode.
 void RV8803::set12Hour()
 {
 	_isTwelveHour = TWELVE_HOUR_MODE;
 }
 
-//Configure RTC to output 0-23 hours
-//Converts any current hour setting to 24 hour
+//Configures the microcontroller to not convert from the default 24 hour mode.
 void RV8803::set24Hour()
 {
 	_isTwelveHour = TWENTYFOUR_HOUR_MODE;
 }
 
-//Returns true if RTC has been configured for 12 hour mode
+//Returns true if the microcontroller has been configured for 12 hour mode
 bool RV8803::is12Hour()
 {
 	return _isTwelveHour;
 }
 
-//Returns true if RTC has PM bit set and 12Hour bit set
+//Returns true if the microcontroller is in 12 hour mode and the RTC has an hours value greater than or equal to 12 (Noon).
 bool RV8803::isPM()
 {
-	return BCDtoDEC(_time[TIME_HOURS]) >= 12;
+	if (is12Hour())
+	{
+		return BCDtoDEC(_time[TIME_HOURS]) >= 12;
+	}
+	else
+	{
+		return false;
+	}
 }
 
-//Returns a pointer to array of chars that are the date in mm/dd/yyyy format because we're weird
+//Returns the date in MM/DD/YYYY format.
 char* RV8803::stringDateUSA()
 {
 	static char date[11]; //Max of mm/dd/yyyy with \0 terminator
@@ -115,7 +121,7 @@ char* RV8803::stringDateUSA()
 	return(date);
 }
 
-//Returns a pointer to array of chars that are the date in dd/mm/yyyy format
+//Returns the date in the DD/MM/YYYY format.
 char*  RV8803::stringDate()
 {
 	static char date[11]; //Max of dd/mm/yyyy with \0 terminator
@@ -123,8 +129,7 @@ char*  RV8803::stringDate()
 	return(date);
 }
 
-//Returns a pointer to array of chars that represents the time in hh:mm:ss format
-//Adds AM/PM if in 12 hour mode
+//Returns the time in hh:mm:ss (Adds AM/PM if in 12 hour mode).
 char* RV8803::stringTime()
 {
 	static char time[11]; //Max of hh:mm:ssXM with \0 terminator
@@ -136,7 +141,10 @@ char* RV8803::stringTime()
 		if(isPM())
 		{
 			half = 'P';
-			twelveHourCorrection = 12;
+			if (BCDtoDEC(_time[TIME_HOURS]) > 12)
+			{
+				twelveHourCorrection = 12;
+			}
 		}
 		sprintf(time, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
 	}
@@ -146,9 +154,10 @@ char* RV8803::stringTime()
 	return(time);
 }
 
+//Returns the most recent timestamp captured on the EVI pin (if the EVI pin has been configured to capture events)
 char* RV8803::stringTimestamp()
 {
-	static char time[14]; //Max of hh:mm:ss:hhXM with \0 terminator
+	static char time[14]; //Max of hh:mm:ss:HHXM with \0 terminator
 
 	if(is12Hour() == true)
 	{
@@ -157,7 +166,10 @@ char* RV8803::stringTimestamp()
 		if(isPM())
 		{
 			half = 'P';
-			twelveHourCorrection = 12;
+			if (BCDtoDEC(_time[TIME_HOURS]) > 12)
+			{
+				twelveHourCorrection = 12;
+			}
 		}
 		sprintf(time, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
 	}
@@ -167,6 +179,7 @@ char* RV8803::stringTimestamp()
 	return(time);
 }
 
+//Returns timestamp in ISO 8601 format (yyyy-mm-ddThh:mm:ss).
 char* RV8803::stringTime8601()
 {
 	static char timeStamp[21]; //Max of yyyy-mm-ddThh:mm:ss with \0 terminator
@@ -176,13 +189,14 @@ char* RV8803::stringTime8601()
 	return(timeStamp);
 }
 
-bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint8_t year)
+//
+bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year)
 {
 	_time[TIME_SECONDS] = DECtoBCD(sec);
 	_time[TIME_MINUTES] = DECtoBCD(min);
 	_time[TIME_HOURS] = DECtoBCD(hour);
 	_time[TIME_DATE] = DECtoBCD(date);
-	_time[TIME_WEEKDAY] = 4;//DECtoBCD(day);
+	_time[TIME_WEEKDAY] = 1 << weekday;
 	_time[TIME_MONTH] = DECtoBCD(month);
 	_time[TIME_YEAR] = DECtoBCD(year - 2000);
 		
@@ -190,7 +204,7 @@ bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, ui
 }
 
 // setTime -- Set time and date/day registers of RV8803 (using data array)
-bool RV8803::setTime(uint8_t * time, uint8_t len)
+bool RV8803::setTime(uint8_t * time, uint8_t len = 8)
 {
 	if (len != TIME_ARRAY_LENGTH)
 		return false;
@@ -234,16 +248,20 @@ bool RV8803::setMonth(uint8_t value)
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
-bool RV8803::setYear(uint8_t value)
+bool RV8803::setYear(uint16_t value)
 {
 	_time[TIME_YEAR] = DECtoBCD(value - 2000);
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
 
-bool RV8803::setWeekday(uint8_t value)
+bool RV8803::setWeekday(uint8_t value) //value is anywhere between 0=sunday and 6=saturday
 {
-	_time[TIME_DATE] = DECtoBCD(value);
+	if (value > 6)
+	{
+		value = 6;
+	}
+	_time[TIME_WEEKDAY] = 1 << value;
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
@@ -290,7 +308,7 @@ uint8_t RV8803::getHours()
 	uint8_t tempHours = BCDtoDEC(_time[TIME_HOURS]);
 	if (is12Hour())
 	{
-		if (isPM())
+		if (tempHours > 12)
 		{
 			tempHours -= 12;
 		}
@@ -305,7 +323,9 @@ uint8_t RV8803::getDate()
 
 uint8_t RV8803::getWeekday()
 {
-	return BCDtoDEC(_time[TIME_WEEKDAY]);
+	uint8_t tempWeekday = _time[TIME_WEEKDAY];
+	tempWeekday = log(tempWeekday) / log(2);
+	return tempWeekday;
 }
 
 uint8_t RV8803::getMonth()
@@ -313,9 +333,9 @@ uint8_t RV8803::getMonth()
 	return BCDtoDEC(_time[TIME_MONTH]);
 }
 
-uint8_t RV8803::getYear()
+uint16_t RV8803::getYear()
 {
-	return BCDtoDEC(_time[TIME_YEAR]);
+	return BCDtoDEC(_time[TIME_YEAR] + 2000);
 }
 
 uint8_t RV8803::getHundredthsCapture()
@@ -335,9 +355,6 @@ bool RV8803::setToCompilerTime()
 	_time[TIME_SECONDS] = DECtoBCD(BUILD_SECOND);
 	_time[TIME_MINUTES] = DECtoBCD(BUILD_MINUTE);
 	_time[TIME_HOURS] = DECtoBCD(BUILD_HOUR);
-
-	//Build_Hour is 0-23, convert to 1-12 if needed
-	
 	
 	_time[TIME_MONTH] = DECtoBCD(BUILD_MONTH);
 	_time[TIME_DATE] = DECtoBCD(BUILD_DATE);
@@ -349,7 +366,7 @@ bool RV8803::setToCompilerTime()
 	uint16_t m = BUILD_MONTH;
 	uint16_t y = BUILD_YEAR;
 	uint16_t weekday = (d+=m<3?y--:y-2,23*m/9+d+4+y/4-y/100+y/400)%7 + 1;
-	_time[TIME_WEEKDAY] = DECtoBCD(weekday);
+	_time[TIME_WEEKDAY] = 1 << weekday;
 	
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }

@@ -34,13 +34,15 @@ void setup() {
   {
     Serial.println("RTC online!");
   }
+  rtc.disableAllInterrupts();
   rtc.setCalibrationOffset(0); //Zero out any calibration settings we may have
-  rtc.setClockOutTimerFrequency(CLOCK_OUT_FREQUENCY_1_HZ); //Set our clockout to a 1 Hz square wave,
+  rtc.setPeriodicTimeUpdateFrequency(CLOCK_OUT_FREQUENCY_1_HZ); //Set our clockout to a 1 Hz square wave,
+  rtc.enableHardwareInterrupt(UPDATE_INTERRUPT); //Enable the interrupt
   //We now must measure the frequency on the Clock Out carefully to calibrate our crystal. To start generating a signal on Clock Out, tie CLKOE High.
   //Change measuredFrequency accordingly, note that you can only correct +/-7.6288 ppm
-  float measuredFrequency = 1.0000012; //Measured frequency in Hz
+  float measuredFrequency = 1.0000012; //Measured frequency in Hz (CHANGE THIS TO YOUR MEASURED VALUE)
   float newPPM = (measuredFrequency - 1) * 1000000; //Calculate PPM difference between measuredFrequency and our desired 1 Hz wave
-  //rtc.setCalibrationOffset(newPPM); //Uncomment this line after you have changed the value of measuredFrequency to load the new calibration into the RTC;
+  //rtc.setCalibrationOffset(newPPM); //Uncomment this line after you have changed the value of measuredFrequency to load the new calibration into the RTC
   
 }
 

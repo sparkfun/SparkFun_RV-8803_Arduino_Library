@@ -55,7 +55,7 @@ void setup() {
   /*if (rtc.setTime(sec, minute, hour, weekday, date, month, year) == false) {
     Serial.println("Something went wrong setting the time");
     }*/
-
+  //rtc.set24Hour(); //Uncomment this line if you'd like to set the RTC to 24 hour mode
 }
 
 void loop() {

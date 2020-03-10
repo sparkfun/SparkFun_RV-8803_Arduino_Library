@@ -149,7 +149,7 @@ class RV8803
 	char* stringTimestamp(); //Return timestamp in hh:mm:ss:hh, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
 	char* stringTime8601(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss
 		
-	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint8_t year);
+	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
 	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
@@ -158,7 +158,7 @@ class RV8803
 	bool setDate(uint8_t value);
 	bool setWeekday(uint8_t value);
 	bool setMonth(uint8_t value);
-	bool setYear(uint8_t value);
+	bool setYear(uint16_t value);
 	
 	bool updateTime(); //Update the local array with the RTC registers
 
@@ -169,7 +169,7 @@ class RV8803
 	uint8_t getDate();
 	uint8_t getWeekday();
 	uint8_t getMonth();
-	uint8_t getYear();	
+	uint16_t getYear();	
 	
 	uint8_t getHundredthsCapture();
 	uint8_t getSecondsCapture();
@@ -194,11 +194,11 @@ class RV8803
 	bool setCountdownTimerFrequency(uint8_t countdownTimerFrequency);
 	
 	bool setClockOutTimerFrequency(uint8_t clockOutTimerFrequency);
+	uint8_t getClockOutTimerFrequency();
 		
 	bool getCountdownTimerEnable();
 	uint16_t getCountdownTimerClockTicks();
 	uint8_t getCountdownTimerFrequency();
-	uint8_t getClockOutTimerFrequency();
 	
 	bool setPeriodicTimeUpdateFrequency(bool timeUpdateFrequency);
 	bool getPeriodicTimeUpdateFrequency();
@@ -209,7 +209,6 @@ class RV8803
 	bool setAlarmWeekday(uint8_t weekday);
 	bool setAlarmDate(uint8_t date);
 	
-	bool getMinuteAlarmEnable();
 	uint8_t getAlarmMinute();
 	uint8_t getAlarmHour();
 	uint8_t getAlarmWeekday();
