@@ -46,9 +46,6 @@ void loop() {
   String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
   //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
   String currentTime = rtc.stringTime(); //Get the time
-  uint8_t weekday = rtc.getWeekday();
-  Serial.print(weekday);
-  Serial.print(" ");
   Serial.print(currentDate);
   Serial.print(" ");
   Serial.println(currentTime);
