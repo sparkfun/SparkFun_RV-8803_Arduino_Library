@@ -11,8 +11,9 @@
   This example shows how to print the time from the RTC.
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
 
@@ -44,7 +45,7 @@ void loop() {
   }
 
   String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
-  //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
+  //String currentDate = rtc.stringDate(); //Get the current date in dd/mm/yyyy format
   String currentTime = rtc.stringTime(); //Get the time
   Serial.print(currentDate);
   Serial.print(" ");
