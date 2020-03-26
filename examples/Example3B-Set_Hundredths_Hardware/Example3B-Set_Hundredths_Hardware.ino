@@ -57,7 +57,8 @@ void loop() {
       Serial.print("Hundredths set to :");
       Serial.println(hundredths);
       delay(10);
-      digitalWrite(EVI_TRIGGER_PIN, HIGH);
+      digitalWrite(EVI_TRIGGER_PIN, HIGH); 
+      rtc.setEVICalibration(ENABLE); //Set the register once more to prepare it for another event
     }
   }
 }

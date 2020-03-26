@@ -4,64 +4,104 @@
 # Class
 ###################################################################
 
-RV1805	KEYWORD1
+RV8803      	    KEYWORD1
 
 ###################################################################
 # Methods and Functions
 ###################################################################
 
-begin	KEYWORD2
-setTime	KEYWORD2
-setHundredths	KEYWORD2
-setSeconds	KEYWORD2
-setMinutes	KEYWORD2
-setHours	KEYWORD2
-setWeekday	KEYWORD2
-setDate	KEYWORD2
-setMonth	KEYWORD2
-setYear	KEYWORD2
+begin	            KEYWORD2
 
-getHundredths	KEYWORD2
-getSeconds	KEYWORD2
-getMinutes	KEYWORD2
-getHours	KEYWORD2
-getWeekday	KEYWORD2
-getDate	KEYWORD2
-getMonth	KEYWORD2
-getYear	KEYWORD2
+set12Hour           KEYWORD2
+set24Hour           KEYWORD2
+is12Hour            KEYWORD2
+isPM                KEYWORD2
 
-updateTime	KEYWORD2
 stringDateUSA	KEYWORD2
 stringDate	KEYWORD2
 stringTime	KEYWORD2
 stringTimeStamp	KEYWORD2
+stringTime8601  KEYWORD2
+
+setTime	            KEYWORD2
+setHundredthsToZero	KEYWORD2
+setSeconds  	    KEYWORD2
+setMinutes  	    KEYWORD2
+setHours	        KEYWORD2
+setWeekday  	    KEYWORD2
+setDate     	    KEYWORD2
+setMonth	        KEYWORD2
+setYear	            KEYWORD2
+
+updateTime	        KEYWORD2
+
+getHundredths	    KEYWORD2
+getSeconds	        KEYWORD2
+getMinutes	        KEYWORD2
+getHours	        KEYWORD2
+getWeekday	        KEYWORD2
+getDate	            KEYWORD2
+getMonth	        KEYWORD2
+getYear	            KEYWORD2
+
+getHundredthsCapture    KEYWORD2
+getSecondsCapture       KEYWORD2
 
 setToCompilerTime	KEYWORD2
-is12Hour	KEYWORD2
-isPM	KEYWORD2
-set12Hour	KEYWORD2
-set24Hour	KEYWORD2
 
-status	KEYWORD2
+setCalibrationOffset    KEYWORD2
+getCalibrationOffset    KEYWORD2
 
-setAlarm	KEYWORD2
-setAlarmMode	KEYWORD2
-enableTrickleCharger	KEYWORD2
-disableTrickleCharger	KEYWORD2
-enableLowPower	KEYWORD2
-enableInterrupt	KEYWORD2
-disableInterrupt	KEYWORD2
-enableBatteryInterrupt	KEYWORD2
-enableAlarmInterrupt	KEYWORD2
 
-setEdgeTrigger	KEYWORD2
-clearInterrupts	KEYWORD2
-checkBattery	KEYWORD2
-setReferenceVoltage	KEYWORD2
+setEVICalibration   KEYWORD2
+setEVIDebounceTime   KEYWORD2
+setEVIEdgeDetection   KEYWORD2
+setEVIEventCapture   KEYWORD2
 
+getEVICalibration   KEYWORD2
+uint8_t getEVIDebounceTime   KEYWORD2
+getEVIEdgeDetection   KEYWORD2
+getEVIEventCapture   KEYWORD2
+	
+setCountdownTimerEnable   KEYWORD2
+setCountdownTimerClockTicks   KEYWORD2
+setCountdownTimerFrequency   KEYWORD2
+
+setClockOutTimerFrequency   KEYWORD2
+getClockOutTimerFrequency   KEYWORD2
+		
+getCountdownTimerEnable   KEYWORD2
+getCountdownTimerClockTicks   KEYWORD2
+getCountdownTimerFrequency   KEYWORD2
+	
+setPeriodicTimeUpdateFrequency   KEYWORD2
+getPeriodicTimeUpdateFrequency   KEYWORD2
+	
+setItemsToMatchForAlarm   KEYWORD2
+setAlarmMinute   KEYWORD2
+setAlarmHour   KEYWORD2
+setAlarmWeekday   KEYWORD2
+setAlarmDate   KEYWORD2
+	
+uint8_t getAlarmMinute   KEYWORD2
+uint8_t getAlarmHour   KEYWORD2
+uint8_t getAlarmWeekday   KEYWORD2
+uint8_t getAlarmDate   KEYWORD2
+
+enableHardwareInterrupt   KEYWORD2
+disableHardwareInterrupt   KEYWORD2
+disableAllInterrupts   KEYWORD2
+	
+getInterruptFlag   KEYWORD2
+clearInterruptFlag   KEYWORD2
+clearAllInterruptFlags   KEYWORD2
+		
 BCDtoDEC	KEYWORD2
 DECtoBCD	KEYWORD2
 
+readBit         KEYWORD2
+readTwoBits     KEYWORD2
+writeBit        KEYWORD2
 readRegister	KEYWORD2
 writeRegister	KEYWORD2
 readMultipleRegisters	KEYWORD2
@@ -70,4 +110,57 @@ writeMultipleRegisters	KEYWORD2
 ###################################################################
 # Constants
 ###################################################################
+ALARM_ENABLE                        LITERAL1
+EXTENSION_TEST						LITERAL1
+EXTENSION_WADA						LITERAL1
+EXTENSION_USEL						LITERAL1
+EXTENSION_TE						LITERAL1
+EXTENSION_FD						LITERAL1
+EXTENSION_TD						LITERAL1
 
+FLAG_UPDATE							LITERAL1
+FLAG_TIMER							LITERAL1
+FLAG_ALARM							LITERAL1
+FLAG_EVI							LITERAL1
+FLAG_V2F							LITERAL1
+FLAG_V1F							LITERAL1
+
+UPDATE_INTERRUPT					LITERAL1
+TIMER_INTERRUPT						LITERAL1
+ALARM_INTERRUPT						LITERAL1
+EVI_INTERRUPT						LITERAL1
+CONTROL_RESET						LITERAL1
+
+EVENT_ECP							LITERAL1
+EVENT_EHL							LITERAL1
+EVENT_ET							LITERAL1
+EVENT_ERST							LITERAL1
+
+TWELVE_HOUR_MODE					LITERAL1
+TWENTYFOUR_HOUR_MODE				LITERAL1
+COUNTDOWN_TIMER_FREQUENCY_4096_HZ	LITERAL1
+COUNTDOWN_TIMER_FREQUENCY_64_HZ		LITERAL1
+COUNTDOWN_TIMER_FREQUENCY_1_HZ		LITERAL1
+COUNTDOWN_TIMER_FREQUENCY_1/60_HZ	LITERAL1
+CLOCK_OUT_FREQUENCY_32768_HZ		LITERAL1
+CLOCK_OUT_FREQUENCY_1024_HZ			LITERAL1
+CLOCK_OUT_FREQUENCY_1_HZ			LITERAL1
+
+COUNTDOWN_TIMER_ON					LITERAL1
+COUNTDOWN_TIMER_OFF					LITERAL1
+TIME_UPDATE_1_SECOND				LITERAL1
+TIME_UPDATE_1_MINUTE				LITERAL1
+
+ENABLE_EVI_CALIBRATION				LITERAL1
+DISABLE_EVI_CALIBRATION				LITERAL1
+EVI_DEBOUNCE_NONE					LITERAL1
+EVI_DEBOUNCE_256HZ					LITERAL1
+EVI_DEBOUNCE_64HZ					LITERAL1
+EVI_DEBOUNCE_8HZ					LITERAL1
+RISING_EDGE							LITERAL1
+FALLING_EDGE						LITERAL1
+EVI_CAPTURE_ENABLE					LITERAL1
+EVI_CAPTURE_DISABLE					LITERAL1
+
+ENABLE								LITERAL1
+DISABLE								LITERAL1
