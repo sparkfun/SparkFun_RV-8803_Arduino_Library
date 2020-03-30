@@ -11,8 +11,9 @@
   This example shows how to set the time on the RTC to the compiler time or a custom time.
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
 
@@ -45,7 +46,7 @@ void setup() {
   }
 
   //Use the time from the Arduino compiler (build time) to set the RTC
-  //Keep in mind that Arduino does not get the new compiler time every time it compiles. to ensure the proper time is loaded, open up a fresh version of the IDE and load the sketch.
+  //Keep in mind that Arduino does not get the new compiler time every time it compiles. To ensure the proper time is loaded, open up a fresh version of the IDE and load the sketch.
   //Also note that due to upload times, compiler time may be a little bit off on seconds/hundredths
   if (rtc.setToCompilerTime() == false) {
     Serial.println("Something went wrong setting the time");

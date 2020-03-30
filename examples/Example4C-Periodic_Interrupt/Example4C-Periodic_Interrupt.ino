@@ -11,8 +11,9 @@
   This example shows how to generate a periodic 1s/1minute interrupt pulse
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
 
@@ -46,8 +47,8 @@ void setup() {
 void loop() {
   if(rtc.getInterruptFlag(FLAG_UPDATE))
   {
-    long timeSinceLastInterrupt = millis() - lastInterruptTime; //Change millis() to micros() if you end up using the 4096 Hz counter
-    lastInterruptTime = millis(); //Change millis() to micros() if you end up using the 4096 Hz counter
+    long timeSinceLastInterrupt = millis() - lastInterruptTime; 
+    lastInterruptTime = millis(); 
     rtc.clearInterruptFlag(FLAG_UPDATE);
     //rtc.clearAllInterruptFlags(); // This can also be used, but beware as it will clear the entire flag register
     Serial.print("Time between interrupts: ");

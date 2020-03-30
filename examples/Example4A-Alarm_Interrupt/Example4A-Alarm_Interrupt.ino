@@ -12,8 +12,9 @@
   The INT pin will be 3.3V. When the real time matches the alarm time the INT pin will go low.
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
 
@@ -28,7 +29,7 @@ uint8_t weekdayAlarmValue = 0; //0-6
 uint8_t dateAlarmValue = 0; //1-31
 
 //Define which alarm registers we want to match, make sure you only enable weekday or date alarm, enabling both will default to a date alarm
-//In it's current state, an alarm will be generated once an hour, when the MINUTES registers on the time and alarm match. Setting MINUTE_ALARM_ENABLE to false would trigger an alarm every minute
+//In its current state, an alarm will be generated once an hour, when the MINUTES registers on the time and alarm match. Setting MINUTE_ALARM_ENABLE to false would trigger an alarm every minute
 #define MINUTE_ALARM_ENABLE true
 #define HOUR_ALARM_ENABLE false
 #define WEEKDAY_ALARM_ENABLE false
@@ -50,8 +51,8 @@ void setup() {
   rtc.setAlarmMinute(minuteAlarmValue);
   rtc.setAlarmHour(hourAlarmValue);
   rtc.setAlarmWeekday(weekdayAlarmValue);
-  //rtc.setAlarmDate(dateAlarmValue);
-  rtc.enableHardwareInterrupt(ALARM_INTERRUPT); //Uncomment this line if you'd like the Interrupt pin to pull low when the alarm flag goes up.
+  //rtc.setAlarmDate(dateAlarmValue); //Uncomment this line if you are using the date alarm instead of the weekday alarm.
+  rtc.enableHardwareInterrupt(ALARM_INTERRUPT); 
 }
 
 void loop() {

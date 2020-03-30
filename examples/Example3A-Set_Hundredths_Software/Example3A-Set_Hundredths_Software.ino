@@ -11,9 +11,10 @@
   This example shows how to set the hundredths register through the I2C interface.
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
-    Open the serial monitor at 9600 baud
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
+    Open the serial monitor at 115200 baud
 */
 
 #include <SparkFun_RV8803.h>

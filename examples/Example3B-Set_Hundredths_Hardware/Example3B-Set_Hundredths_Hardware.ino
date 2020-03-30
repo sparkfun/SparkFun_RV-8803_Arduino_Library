@@ -11,9 +11,10 @@
   This example shows how to set the hundredths register through hardware.
 
   Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
-    Open the serial monitor at 9600 baud
+    Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
+    If you are using an adapter cable, here is the wire color scheme: 
+    Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
+    Open the serial monitor at 115200 baud
 */
 
 #include <SparkFun_RV8803.h>
@@ -38,7 +39,7 @@ void setup() {
   }
 
   rtc.disableHardwareInterrupt(EVI_INTERRUPT); //Disbale the interrupt so we don't accidentally cause any based on this
-  rtc.setEVICalibration(ENABLE); //Set's the RTC to reset the hundredths register on button press, or an external event. Must be run before the external event that you want to capture occurs.
+  rtc.setEVICalibration(ENABLE); //Sets the RTC to reset the hundredths register on button press or an external event. Must be run before the external event that you want to capture occurs.
   
   pinMode(EVI_TRIGGER_PIN, OUTPUT);
   digitalWrite(EVI_TRIGGER_PIN, HIGH); //Only write the pin HIGH if you are using a 3.3V microcontroller
@@ -51,7 +52,7 @@ void loop() {
     char resetCharacter = Serial.read();
     if (resetCharacter == 'r')
     {
-      digitalWrite(EVI_TRIGGER_PIN, LOW); //The EVI pin is active low, this also clears the EVI calibration bit, so you will need to reset that bit before you try to reset hundredths using hardware again.
+      digitalWrite(EVI_TRIGGER_PIN, LOW); //The EVI pin is active LOW, this also clears the EVI calibration bit. Reset that bit before you try to reset hundredths using hardware again. This is performed at the end of the loop in this example.
       rtc.updateTime(); //Grab time data from the RTC 
       uint8_t hundredths = rtc.getHundredths();
       Serial.print("Hundredths set to :");
