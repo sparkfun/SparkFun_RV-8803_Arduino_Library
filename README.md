@@ -26,6 +26,7 @@ Repository Contents
 Documentation
 --------------
 * **[Installing an Arduino Library Guide](https://learn.sparkfun.com/tutorials/installing-an-arduino-library)** - Basic information on how to install an Arduino library.
+* **[Real Time Clock Module - RV-8803 (Qwiic) Hookup Guide](https://learn.sparkfun.com/tutorials/real-time-clock-module---rv-8803-qwiic-hookup-guide)** - A Hookup Guide for the RV-8803 Qwiic breakout.
 * **[Product Repository](https://github.com/sparkfun/Qwiic_Real_Time_Clock_RV-8803)** - Main repository (including hardware files) for the SparkFun Qwiic RTC Breakout.
 
 Products That Use This Library 
