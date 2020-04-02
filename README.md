@@ -31,7 +31,7 @@ Documentation
 
 Products That Use This Library 
 ---------------------------------
-* [BOB-16281](https://www.sparkfun.com/products/16281) - SparkFun red version
+* [BOB-16281](https://www.sparkfun.com/products/16281) - SparkFun Real Time Clock Module - RV-8803 (Qwiic)
 
 License Information
 -------------------
