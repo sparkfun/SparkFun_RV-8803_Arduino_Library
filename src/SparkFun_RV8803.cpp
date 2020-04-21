@@ -189,6 +189,24 @@ char* RV8803::stringTime8601()
 	return(timeStamp);
 }
 
+//Returns time in UNIX Epoch time format
+uint32_t RV8803::getEpoch()
+{
+  struct tm tm;
+
+  tm.tm_isdst = -1;
+  tm.tm_yday = 0;
+  tm.tm_wday = 0;
+  tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
+  tm.tm_mon = BCDtoDEC(_time[TIME_MONTH]) - 1;
+  tm.tm_mday = BCDtoDEC(_time[TIME_DATE]);
+  tm.tm_hour = BCDtoDEC(_time[TIME_HOURS]);
+  tm.tm_min = BCDtoDEC(_time[TIME_MINUTES]);
+  tm.tm_sec = BCDtoDEC(_time[TIME_SECONDS]);
+
+  return mktime(&tm);
+}
+
 //
 bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year)
 {
