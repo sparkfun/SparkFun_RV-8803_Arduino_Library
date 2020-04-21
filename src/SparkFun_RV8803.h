@@ -170,6 +170,7 @@ class RV8803
 	uint8_t getWeekday();
 	uint8_t getMonth();
 	uint16_t getYear();	
+	uint32_t getEpoch();
 	
 	uint8_t getHundredthsCapture();
 	uint8_t getSecondsCapture();

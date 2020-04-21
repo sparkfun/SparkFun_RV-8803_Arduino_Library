@@ -14,6 +14,7 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
+#include <time.h>
 #include "SparkFun_RV8803.h"
 
 //****************************************************************************//
@@ -187,6 +188,24 @@ char* RV8803::stringTime8601()
 	sprintf(timeStamp, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
 	
 	return(timeStamp);
+}
+
+//Returns time in UNIX Epoch time format
+uint32_t RV8803::getEpoch()
+{
+  struct tm tm;
+
+  tm.tm_isdst = -1;
+  tm.tm_yday = 0;
+  tm.tm_wday = 0;
+  tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
+  tm.tm_mon = BCDtoDEC(_time[TIME_MONTH]) - 1;
+  tm.tm_mday = BCDtoDEC(_time[TIME_DATE]);
+  tm.tm_hour = BCDtoDEC(_time[TIME_HOURS]);
+  tm.tm_min = BCDtoDEC(_time[TIME_MINUTES]);
+  tm.tm_sec = BCDtoDEC(_time[TIME_SECONDS]);
+
+  return mktime(&tm);
 }
 
 //
