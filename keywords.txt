@@ -43,6 +43,7 @@ getWeekday	        KEYWORD2
 getDate	            KEYWORD2
 getMonth	        KEYWORD2
 getYear	            KEYWORD2
+getEpoch	KEYWORD2
 
 getHundredthsCapture    KEYWORD2
 getSecondsCapture       KEYWORD2
