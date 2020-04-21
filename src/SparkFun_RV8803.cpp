@@ -3,7 +3,7 @@ SparkFun_RV8803.h
 RV8803 Arduino Library
 Andy England @ SparkFun Electronics
 March 3, 2020
-https://github.com/sparkfun/Qwiic_RTC
+https://github.com/sparkfun/SparkFun_RV-8803_Arduino_Library
 
 Development environment specifics:
 Arduino IDE 1.6.4
@@ -354,7 +354,7 @@ uint8_t RV8803::getMonth()
 
 uint16_t RV8803::getYear()
 {
-	return BCDtoDEC(_time[TIME_YEAR] + 2000);
+	return BCDtoDEC(_time[TIME_YEAR]) + 2000;
 }
 
 uint8_t RV8803::getHundredthsCapture()
