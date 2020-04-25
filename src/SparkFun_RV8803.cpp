@@ -212,7 +212,7 @@ uint32_t RV8803::getEpoch()
 bool RV8803::setEpoch(uint32_t value)
 {
 	if (value < 946684800) {
-		value = 946684800;
+		value = 946684800; // 2000-01-01 00:00:00
 	}
 
 	struct tm tm;
