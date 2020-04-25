@@ -40,7 +40,7 @@ void setup() {
 
 void loop() {
 
-  if (rtc.updateTime() == false) //Updates the time variables from RTC
+  if (rtc.updateTime() == false) // Updates the time variables from RTC
   {
     Serial.print("RTC failed to update");
   }
