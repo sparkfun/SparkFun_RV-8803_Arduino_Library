@@ -193,22 +193,44 @@ char* RV8803::stringTime8601()
 //Returns time in UNIX Epoch time format
 uint32_t RV8803::getEpoch()
 {
-  struct tm tm;
+	struct tm tm;
 
-  tm.tm_isdst = -1;
-  tm.tm_yday = 0;
-  tm.tm_wday = 0;
-  tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
-  tm.tm_mon = BCDtoDEC(_time[TIME_MONTH]) - 1;
-  tm.tm_mday = BCDtoDEC(_time[TIME_DATE]);
-  tm.tm_hour = BCDtoDEC(_time[TIME_HOURS]);
-  tm.tm_min = BCDtoDEC(_time[TIME_MINUTES]);
-  tm.tm_sec = BCDtoDEC(_time[TIME_SECONDS]);
+	tm.tm_isdst = -1;
+	tm.tm_yday = 0;
+	tm.tm_wday = 0;
+	tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
+	tm.tm_mon = BCDtoDEC(_time[TIME_MONTH]) - 1;
+	tm.tm_mday = BCDtoDEC(_time[TIME_DATE]);
+	tm.tm_hour = BCDtoDEC(_time[TIME_HOURS]);
+	tm.tm_min = BCDtoDEC(_time[TIME_MINUTES]);
+	tm.tm_sec = BCDtoDEC(_time[TIME_SECONDS]);
 
   return mktime(&tm);
 }
 
-//
+//Sets time using UNIX Epoch time
+bool RV8803::setEpoch(uint32_t value)
+{
+	if (value < 946684800) {
+		value = 946684800;
+	}
+
+	struct tm tm;
+	time_t t = value;
+	struct tm* tmp = gmtime(&t);
+
+	_time[TIME_SECONDS] = DECtoBCD(tmp->tm_sec);
+	_time[TIME_MINUTES] = DECtoBCD(tmp->tm_min);
+	_time[TIME_HOURS] = DECtoBCD(tmp->tm_hour);
+	_time[TIME_DATE] = DECtoBCD(tmp->tm_mday);
+	_time[TIME_WEEKDAY] = 1 << tmp->tm_wday;
+	_time[TIME_MONTH] = DECtoBCD(tmp->tm_mon + 1);
+	_time[TIME_YEAR] = DECtoBCD(tmp->tm_year - 100);
+		
+	return setTime(_time, TIME_ARRAY_LENGTH); //Subtract one as we don't write to the hundredths register
+}
+
+//Set time and date/day registers of RV8803
 bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year)
 {
 	_time[TIME_SECONDS] = DECtoBCD(sec);
@@ -222,7 +244,7 @@ bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, ui
 	return setTime(_time, TIME_ARRAY_LENGTH); //Subtract one as we don't write to the hundredths register
 }
 
-// setTime -- Set time and date/day registers of RV8803 (using data array)
+//Set time and date/day registers of RV8803 (using data array)
 bool RV8803::setTime(uint8_t * time, uint8_t len = 8)
 {
 	if (len != TIME_ARRAY_LENGTH)
