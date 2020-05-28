@@ -151,6 +151,7 @@ class RV8803
 		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
+	bool setEpoch(uint32_t value);
 	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
 	bool setMinutes(uint8_t value);
@@ -159,6 +160,7 @@ class RV8803
 	bool setWeekday(uint8_t value);
 	bool setMonth(uint8_t value);
 	bool setYear(uint16_t value);
+
 	
 	bool updateTime(); //Update the local array with the RTC registers
 
