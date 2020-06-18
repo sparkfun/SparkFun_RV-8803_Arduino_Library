@@ -44,6 +44,7 @@ void setup() {
   //Since the resolution for this setting is 15.625 mS per LSB, we'll convert 3.5 seconds to 3500 ms. We'll then simply divide the time we want by the resolution to get the number of clock ticks we need to wait to fire the interrupt
   //3500 / 15.625 = 224 Clock ticks
   rtc.disableAllInterrupts();
+  rtc.clearAllInterruptFlags();//Clear all flags in case any interrupts have occurred.
   rtc.setCountdownTimerFrequency(COUNTDOWN_TIMER_FREQUENCY_64_HZ);
   rtc.setCountdownTimerClockTicks(224);
   rtc.enableHardwareInterrupt(TIMER_INTERRUPT);

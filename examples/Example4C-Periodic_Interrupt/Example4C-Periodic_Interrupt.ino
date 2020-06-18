@@ -39,6 +39,7 @@ void setup() {
   }
   
   rtc.disableAllInterrupts();
+  rtc.clearAllInterruptFlags();//Clear all flags in case any interrupts have occurred.
   rtc.setPeriodicTimeUpdateFrequency(TIME_UPDATE_1_SECOND); //Can also use TIME_UPDATE_1_MINUTE (TIME_UPDATE_1_SECOND = false, TIME_UPDATE_1_MINUTE = true)
   rtc.enableHardwareInterrupt(UPDATE_INTERRUPT); //The update interrupt needs to have the hardware interrupt enabled to function
   lastInterruptTime = millis();
