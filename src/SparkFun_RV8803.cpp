@@ -568,7 +568,7 @@ bool RV8803::setAlarmWeekday(uint8_t weekday)
 {
 	uint8_t value = readRegister(RV8803_WEEKDAYS_DATE_ALARM);
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
-	value |= DECtoBCD(weekday);
+	value |= 0x7F & weekday;
 	return writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
 
 }

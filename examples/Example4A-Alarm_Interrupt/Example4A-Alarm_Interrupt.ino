@@ -25,7 +25,7 @@ RV8803 rtc;
 //Make sure to change these values to the decimal values that you want to match
 uint8_t minuteAlarmValue = 55; //0-60, change this to a minute or two from now to see the alarm get generated
 uint8_t hourAlarmValue = 0; //0-24
-uint8_t weekdayAlarmValue = 0; //0-6
+uint8_t weekdayAlarmValue = SUNDAY | SATURDAY; //Or together days of the week to enable the alarm on those days.
 uint8_t dateAlarmValue = 0; //1-31
 
 //Define which alarm registers we want to match, make sure you only enable weekday or date alarm, enabling both will default to a date alarm

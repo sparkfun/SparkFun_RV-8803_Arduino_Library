@@ -31,6 +31,13 @@ Distributed as-is; no warranty is given.
 //The 7-bit I2C address of the RV8803
 #define RV8803_ADDR							0x32
 
+#define SUNDAY 0x01
+#define MONDAY 0x02
+#define TUESDAY 0x04
+#define WEDNESDAY 0x08
+#define THURSDAY 0x10
+#define FRIDAY 0x20
+#define SATURDAY 0x40
 
 //Register names:
 #define RV8803_RAM							0x07
