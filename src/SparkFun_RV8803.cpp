@@ -255,8 +255,9 @@ bool RV8803::setTime(uint8_t * time, uint8_t len = 8)
 
 bool RV8803::setHundredthsToZero()
 {
-	writeBit(RV8803_CONTROL, CONTROL_RESET, ENABLE);
-	writeBit(RV8803_CONTROL, CONTROL_RESET, DISABLE);
+	bool temp = writeBit(RV8803_CONTROL, CONTROL_RESET, ENABLE);
+	temp &= writeBit(RV8803_CONTROL, CONTROL_RESET, DISABLE);
+	return temp;
 }
 
 bool RV8803::setSeconds(uint8_t value)
@@ -677,6 +678,7 @@ uint8_t RV8803::readRegister(uint8_t addr)
     {
         return _i2cPort->read();
     }
+	return false;
 }
 
 bool RV8803::writeRegister(uint8_t addr, uint8_t val)
