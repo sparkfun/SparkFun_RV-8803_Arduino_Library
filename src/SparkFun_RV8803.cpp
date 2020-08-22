@@ -215,7 +215,6 @@ bool RV8803::setEpoch(uint32_t value)
 		value = 946684800; // 2000-01-01 00:00:00
 	}
 
-	struct tm tm;
 	time_t t = value;
 	struct tm* tmp = gmtime(&t);
 
