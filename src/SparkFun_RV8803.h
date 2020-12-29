@@ -46,12 +46,12 @@ Distributed as-is; no warranty is given.
 #define RV8803_MINUTES						0x12
 #define RV8803_HOURS						0x13
 #define RV8803_WEEKDAYS						0x14
-#define RV8803_DATE         				0x15
-#define RV8803_MONTHS        				0x16
-#define RV8803_YEARS        				0x17
-#define RV8803_MINUTES_ALARM     			0x18
-#define RV8803_HOURS_ALARM       			0x19
-#define RV8803_WEEKDAYS_DATE_ALARM   		0x1A
+#define RV8803_DATE							0x15
+#define RV8803_MONTHS						0x16
+#define RV8803_YEARS						0x17
+#define RV8803_MINUTES_ALARM				0x18
+#define RV8803_HOURS_ALARM					0x19
+#define RV8803_WEEKDAYS_DATE_ALARM			0x1A
 #define RV8803_TIMER_0						0x1B
 #define RV8803_TIMER_1						0x1C
 #define RV8803_EXTENSION					0x1D
@@ -127,14 +127,14 @@ Distributed as-is; no warranty is given.
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
 
 enum time_order {
-	TIME_HUNDREDTHS, // 0
-	TIME_SECONDS,    // 1
-	TIME_MINUTES,    // 2
-	TIME_HOURS,      // 3
-	TIME_WEEKDAY,	 // 4
-	TIME_DATE,       // 5
-	TIME_MONTH,      // 6
-	TIME_YEAR,       // 7
+	TIME_HUNDREDTHS,	// 0
+	TIME_SECONDS,		// 1
+	TIME_MINUTES,		// 2
+	TIME_HOURS,			// 3
+	TIME_WEEKDAY,		// 4
+	TIME_DATE,			// 5
+	TIME_MONTH,			// 6
+	TIME_YEAR,			// 7
 };
 
 class RV8803
@@ -168,7 +168,6 @@ class RV8803
 	bool setMonth(uint8_t value);
 	bool setYear(uint16_t value);
 
-	
 	bool updateTime(); //Update the local array with the RTC registers
 
 	uint8_t getHundredths();
@@ -214,13 +213,13 @@ class RV8803
 	bool getPeriodicTimeUpdateFrequency();
 	
 	void setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool weekdayAlarm, bool dateAlarm); //0 to 7, alarm goes off with match of second, minute, hour, etc
-	bool setAlarmMinute(uint8_t minute);
-	bool setAlarmHour(uint8_t hour);
+	bool setAlarmMinutes(uint8_t minute);
+	bool setAlarmHours(uint8_t hour);
 	bool setAlarmWeekday(uint8_t weekday);
 	bool setAlarmDate(uint8_t date);
 	
-	uint8_t getAlarmMinute();
-	uint8_t getAlarmHour();
+	uint8_t getAlarmMinutes();
+	uint8_t getAlarmHours();
 	uint8_t getAlarmWeekday();
 	uint8_t getAlarmDate();
 
