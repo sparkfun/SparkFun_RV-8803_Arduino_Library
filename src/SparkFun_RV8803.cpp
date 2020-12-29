@@ -76,9 +76,9 @@ bool RV8803::begin(TwoWire &wirePort)
 	
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	
-    if (_i2cPort->endTransmission() != 0)
+	if (_i2cPort->endTransmission() != 0)
 	{
-      return (false); //Error: Sensor did not ack
+		return (false); //Error: Sensor did not ack
 	}
 	return(true);
 }
@@ -696,12 +696,12 @@ uint8_t RV8803::readRegister(uint8_t addr)
 	_i2cPort->write(addr);
 	_i2cPort->endTransmission();
 
-    //typecasting the 1 parameter in requestFrom so that the compiler
-    //doesn't give us a warning about multiple candidates
-    if (_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), static_cast<uint8_t>(1)) != 0)
-    {
-        return _i2cPort->read();
-    }
+	//typecasting the 1 parameter in requestFrom so that the compiler
+	//doesn't give us a warning about multiple candidates
+	if (_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), static_cast<uint8_t>(1)) != 0)
+	{
+		return _i2cPort->read();
+	}
 	return false;
 }
 
@@ -710,8 +710,8 @@ bool RV8803::writeRegister(uint8_t addr, uint8_t val)
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	_i2cPort->write(addr);
 	_i2cPort->write(val);
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 	return(true);
 }
 
@@ -724,8 +724,8 @@ bool RV8803::writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len)
 		_i2cPort->write(values[i]);
 	}
 
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 	return(true);
 }
 
@@ -733,8 +733,8 @@ bool RV8803::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)
 {
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	_i2cPort->write(addr);
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 
 	_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), len);
 	for (uint8_t i = 0; i < len; i++)

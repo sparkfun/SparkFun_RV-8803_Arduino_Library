@@ -139,11 +139,11 @@ enum time_order {
 
 class RV8803
 {
-  public:
+public:
 	
-    RV8803( void );
+	RV8803( void );
 
-    bool begin(TwoWire &wirePort = Wire);
+	bool begin(TwoWire &wirePort = Wire);
 	
 	void set12Hour();
 	void set24Hour();
@@ -239,12 +239,12 @@ class RV8803
 	uint8_t readTwoBits(uint8_t regAddr, uint8_t bitAddr);
 	bool writeBit(uint8_t regAddr, uint8_t bitAddr, bool bitToWrite);
 	bool writeBit(uint8_t regAddr, uint8_t bitAddr, uint8_t bitToWrite);
-    uint8_t readRegister(uint8_t addr);
-    bool writeRegister(uint8_t addr, uint8_t val);
+	uint8_t readRegister(uint8_t addr);
+	bool writeRegister(uint8_t addr, uint8_t val);
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);
 	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
 
-private:
+  private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	bool _isTwelveHour = true;
 	TwoWire *_i2cPort;
