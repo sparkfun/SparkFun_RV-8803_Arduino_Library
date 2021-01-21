@@ -49,8 +49,8 @@ void setup() {
   rtc.disableAllInterrupts();
   rtc.clearAllInterruptFlags();//Clear all flags in case any interrupts have occurred.
   rtc.setItemsToMatchForAlarm(MINUTE_ALARM_ENABLE, HOUR_ALARM_ENABLE, WEEKDAY_ALARM_ENABLE, DATE_ALARM_ENABLE); //The alarm interrupt compares the alarm interrupt registers with the current time registers. We must choose which registers we want to compare by setting bits to true or false
-  rtc.setAlarmMinute(minuteAlarmValue);
-  rtc.setAlarmHour(hourAlarmValue);
+  rtc.setAlarmMinutes(minuteAlarmValue);
+  rtc.setAlarmHours(hourAlarmValue);
   rtc.setAlarmWeekday(weekdayAlarmValue);
   //rtc.setAlarmDate(dateAlarmValue); //Uncomment this line if you are using the date alarm instead of the weekday alarm.
   rtc.enableHardwareInterrupt(ALARM_INTERRUPT); 
