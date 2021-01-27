@@ -121,7 +121,7 @@ Distributed as-is; no warranty is given.
 #define EVI_CAPTURE_ENABLE					true
 #define EVI_CAPTURE_DISABLE					false
 
-#define ENABLE								true
+#define RV8803_ENABLE						true
 #define DISABLE								false
 
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device

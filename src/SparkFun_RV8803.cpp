@@ -254,7 +254,7 @@ bool RV8803::setTime(uint8_t * time, uint8_t len = 8)
 
 bool RV8803::setHundredthsToZero()
 {
-	bool temp = writeBit(RV8803_CONTROL, CONTROL_RESET, ENABLE);
+	bool temp = writeBit(RV8803_CONTROL, CONTROL_RESET, RV8803_ENABLE);
 	temp &= writeBit(RV8803_CONTROL, CONTROL_RESET, DISABLE);
 	return temp;
 }
