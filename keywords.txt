@@ -12,7 +12,7 @@ RV8803	KEYWORD1
 
 begin	KEYWORD2
 
-set12Hour 	KEYWORD2
+set12Hour	KEYWORD2
 set24Hour	KEYWORD2
 is12Hour	KEYWORD2
 isPM	KEYWORD2
@@ -80,13 +80,13 @@ setPeriodicTimeUpdateFrequency	KEYWORD2
 getPeriodicTimeUpdateFrequency	KEYWORD2
 
 setItemsToMatchForAlarm	KEYWORD2
-setAlarmMinute	KEYWORD2
-setAlarmHour	KEYWORD2
+setAlarmMinutes	KEYWORD2
+setAlarmHours	KEYWORD2
 setAlarmWeekday	KEYWORD2
-setAlarmDate 	KEYWORD2
+setAlarmDate	KEYWORD2
 
-uint8_t getAlarmMinute	KEYWORD2
-uint8_t getAlarmHour	KEYWORD2
+uint8_t getAlarmMinutes	KEYWORD2
+uint8_t getAlarmHours	KEYWORD2
 uint8_t getAlarmWeekday	KEYWORD2
 uint8_t getAlarmDate	KEYWORD2
 

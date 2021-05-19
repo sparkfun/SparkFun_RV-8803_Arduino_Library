@@ -76,9 +76,9 @@ bool RV8803::begin(TwoWire &wirePort)
 	
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	
-    if (_i2cPort->endTransmission() != 0)
+	if (_i2cPort->endTransmission() != 0)
 	{
-      return (false); //Error: Sensor did not ack
+		return (false); //Error: Sensor did not ack
 	}
 	return(true);
 }
@@ -548,7 +548,7 @@ void RV8803::setItemsToMatchForAlarm(bool minuteAlarm, bool hourAlarm, bool week
 	}
 }
 
-bool RV8803::setAlarmMinute(uint8_t minute)
+bool RV8803::setAlarmMinutes(uint8_t minute)
 {
 	uint8_t value = readRegister(RV8803_MINUTES_ALARM);
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
@@ -556,7 +556,7 @@ bool RV8803::setAlarmMinute(uint8_t minute)
 	return writeRegister(RV8803_MINUTES_ALARM, value);
 }
 
-bool RV8803::setAlarmHour(uint8_t hour)
+bool RV8803::setAlarmHours(uint8_t hour)
 {
 	uint8_t value = readRegister(RV8803_HOURS_ALARM);
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
@@ -579,6 +579,29 @@ bool RV8803::setAlarmDate(uint8_t date)
 	value &= (1 << ALARM_ENABLE); //clear everything but enable bit
 	value |= DECtoBCD(date);
 	return writeRegister(RV8803_WEEKDAYS_DATE_ALARM, value);
+}
+
+
+uint8_t RV8803::getAlarmMinutes()
+{
+	return BCDtoDEC(readRegister(RV8803_MINUTES_ALARM));
+}
+
+
+uint8_t RV8803::getAlarmHours()
+{
+	return BCDtoDEC(readRegister(RV8803_HOURS_ALARM));
+}
+
+
+uint8_t RV8803::getAlarmWeekday()
+{
+	return BCDtoDEC(readRegister(RV8803_WEEKDAYS_DATE_ALARM));
+}
+
+uint8_t RV8803::getAlarmDate()
+{
+	return BCDtoDEC(readRegister(RV8803_WEEKDAYS_DATE_ALARM));
 }
 
 /*********************************
@@ -657,7 +680,8 @@ bool RV8803::writeBit(uint8_t regAddr, uint8_t bitAddr, bool bitToWrite)
 	value |= bitToWrite << bitAddr;
 	return writeRegister(regAddr, value);
 }
-bool RV8803::writeBit(uint8_t regAddr, uint8_t bitAddr, uint8_t bitToWrite) //If we seean unsigned eight bit, we know we have to write two bits.
+
+bool RV8803::writeBit(uint8_t regAddr, uint8_t bitAddr, uint8_t bitToWrite) //If we see an unsigned 8-bit, we know we have to write two bits.
 {
 	uint8_t value = readRegister(regAddr);
 	value &= ~(3 << bitAddr);
@@ -671,12 +695,12 @@ uint8_t RV8803::readRegister(uint8_t addr)
 	_i2cPort->write(addr);
 	_i2cPort->endTransmission();
 
-    //typecasting the 1 parameter in requestFrom so that the compiler
-    //doesn't give us a warning about multiple candidates
-    if (_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), static_cast<uint8_t>(1)) != 0)
-    {
-        return _i2cPort->read();
-    }
+	//typecasting the 1 parameter in requestFrom so that the compiler
+	//doesn't give us a warning about multiple candidates
+	if (_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), static_cast<uint8_t>(1)) != 0)
+	{
+		return _i2cPort->read();
+	}
 	return false;
 }
 
@@ -685,8 +709,8 @@ bool RV8803::writeRegister(uint8_t addr, uint8_t val)
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	_i2cPort->write(addr);
 	_i2cPort->write(val);
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 	return(true);
 }
 
@@ -699,8 +723,8 @@ bool RV8803::writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len)
 		_i2cPort->write(values[i]);
 	}
 
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 	return(true);
 }
 
@@ -708,8 +732,8 @@ bool RV8803::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)
 {
 	_i2cPort->beginTransmission(RV8803_ADDR);
 	_i2cPort->write(addr);
-    if (_i2cPort->endTransmission() != 0)
-      return (false); //Error: Sensor did not ack
+	if (_i2cPort->endTransmission() != 0)
+		return (false); //Error: Sensor did not ack
 
 	_i2cPort->requestFrom(static_cast<uint8_t>(RV8803_ADDR), len);
 	for (uint8_t i = 0; i < len; i++)
