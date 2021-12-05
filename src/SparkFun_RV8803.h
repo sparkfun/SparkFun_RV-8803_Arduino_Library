@@ -150,10 +150,15 @@ public:
 	bool is12Hour(); //Returns true if 12hour bit is set
 	bool isPM(); //Returns true if is12Hour and PM bit is set
 
+	char* stringDateUSA(char *buffer, size_t len); //Return date in mm-dd-yyyy in supplied buffer
 	char* stringDateUSA(); //Return date in mm-dd-yyyy
+	char* stringDate(char *buffer, size_t len); //Return date in dd-mm-yyyy in supplied buffer
 	char* stringDate(); //Return date in dd-mm-yyyy
+	char* stringTime(char *buffer, size_t len);  //Return time hh:mm:ss with AM/PM if in 12 hour mode in supplied buffer
 	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
+	char* stringTimestamp(char *buffer, size_t len); //Return timestamp in hh:mm:ss:hh in supplied buffer, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
 	char* stringTimestamp(); //Return timestamp in hh:mm:ss:hh, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
+	char* stringTime8601(char *buffer, size_t len); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss in supplied buffer
 	char* stringTime8601(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss
 		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
