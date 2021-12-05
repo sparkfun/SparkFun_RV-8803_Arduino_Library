@@ -118,7 +118,7 @@ bool RV8803::isPM()
 char* RV8803::stringDateUSA()
 {
 	static char date[11]; //Max of mm/dd/yyyy with \0 terminator
-	sprintf(date, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_YEAR]));
+	sprintf(date, "%02hhd/%02hhd/20%02hhd", BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_YEAR]));
 	return(date);
 }
 
@@ -126,7 +126,7 @@ char* RV8803::stringDateUSA()
 char*  RV8803::stringDate()
 {
 	static char date[11]; //Max of dd/mm/yyyy with \0 terminator
-	sprintf(date, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_YEAR]));
+	sprintf(date, "%02hhd/%02hhd/20%02hhd", BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_YEAR]));
 	return(date);
 }
 
@@ -147,10 +147,10 @@ char* RV8803::stringTime()
 				twelveHourCorrection = 12;
 			}
 		}
-		sprintf(time, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
+		sprintf(time, "%02hhd:%02hhd:%02hhd%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
 	}
 	else
-	sprintf(time, "%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
+	sprintf(time, "%02hhd:%02hhd:%02hhd", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
 	
 	return(time);
 }
@@ -172,10 +172,10 @@ char* RV8803::stringTimestamp()
 				twelveHourCorrection = 12;
 			}
 		}
-		sprintf(time, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
+		sprintf(time, "%02hhd:%02hhd:%02hhd:%02hhd%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
 	}
 	else
-	sprintf(time, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
+	sprintf(time, "%02hhd:%02hhd:%02hhd:%02hhd", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
 	
 	return(time);
 }
@@ -185,7 +185,7 @@ char* RV8803::stringTime8601()
 {
 	static char timeStamp[21]; //Max of yyyy-mm-ddThh:mm:ss with \0 terminator
 
-	sprintf(timeStamp, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
+	sprintf(timeStamp, "20%02hhd-%02hhd-%02hhdT%02hhd:%02hhd:%02hhd", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
 	
 	return(timeStamp);
 }
