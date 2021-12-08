@@ -239,7 +239,6 @@ bool RV8803::setEpoch(uint32_t value)
 		value = 946684800; // 2000-01-01 00:00:00
 	}
 
-	struct tm tm;
 	time_t t = value;
 	struct tm* tmp = gmtime(&t);
 
@@ -279,8 +278,8 @@ bool RV8803::setTime(uint8_t * time, uint8_t len = 8)
 
 bool RV8803::setHundredthsToZero()
 {
-	bool temp = writeBit(RV8803_CONTROL, CONTROL_RESET, ENABLE);
-	temp &= writeBit(RV8803_CONTROL, CONTROL_RESET, DISABLE);
+	bool temp = writeBit(RV8803_CONTROL, CONTROL_RESET, RV8803_ENABLE);
+	temp &= writeBit(RV8803_CONTROL, CONTROL_RESET, RV8803_DISABLE);
 	return temp;
 }
 
