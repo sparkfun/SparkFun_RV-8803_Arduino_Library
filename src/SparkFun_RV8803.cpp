@@ -115,51 +115,66 @@ bool RV8803::isPM()
 }
 
 //Returns the date in MM/DD/YYYY format.
+char* RV8803::stringDateUSA(char *buffer, size_t len)
+{
+	snprintf(buffer, len, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_YEAR]));
+	return(buffer);
+}
+
+//Returns the date in MM/DD/YYYY format.
 char* RV8803::stringDateUSA()
 {
 	static char date[11]; //Max of mm/dd/yyyy with \0 terminator
-	sprintf(date, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_YEAR]));
-	return(date);
+	return stringDateUSA(date, sizeof(date));
+}
+
+//Returns the date in the DD/MM/YYYY format.
+char*  RV8803::stringDate(char *buffer, size_t len)
+{
+	snprintf(buffer, len, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_YEAR]));
+	return(buffer);
 }
 
 //Returns the date in the DD/MM/YYYY format.
 char*  RV8803::stringDate()
 {
 	static char date[11]; //Max of dd/mm/yyyy with \0 terminator
-	sprintf(date, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_YEAR]));
-	return(date);
+	return stringDate(date, sizeof(date));
+}
+
+//Returns the time in hh:mm:ss (Adds AM/PM if in 12 hour mode).
+char* RV8803::stringTime(char *buffer, size_t len)
+{
+	if(is12Hour() == true)
+	{
+		char half = 'A';
+		uint8_t twelveHourCorrection = 0;
+		if(isPM())
+		{
+			half = 'P';
+			if (BCDtoDEC(_time[TIME_HOURS]) > 12)
+			{
+				twelveHourCorrection = 12;
+			}
+		}
+		snprintf(buffer, len, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
+	}
+	else
+	snprintf(buffer, len, "%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
+	
+	return(buffer);
 }
 
 //Returns the time in hh:mm:ss (Adds AM/PM if in 12 hour mode).
 char* RV8803::stringTime()
 {
-	static char time[11]; //Max of hh:mm:ssXM with \0 terminator
-
-	if(is12Hour() == true)
-	{
-		char half = 'A';
-		uint8_t twelveHourCorrection = 0;
-		if(isPM())
-		{
-			half = 'P';
-			if (BCDtoDEC(_time[TIME_HOURS]) > 12)
-			{
-				twelveHourCorrection = 12;
-			}
-		}
-		sprintf(time, "%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
-	}
-	else
-	sprintf(time, "%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
-	
-	return(time);
+	static char time[11];
+	return stringTime(time, sizeof(time));
 }
 
 //Returns the most recent timestamp captured on the EVI pin (if the EVI pin has been configured to capture events)
-char* RV8803::stringTimestamp()
+char* RV8803::stringTimestamp(char *buffer, size_t len)
 {
-	static char time[14]; //Max of hh:mm:ss:HHXM with \0 terminator
-
 	if(is12Hour() == true)
 	{
 		char half = 'A';
@@ -172,22 +187,31 @@ char* RV8803::stringTimestamp()
 				twelveHourCorrection = 12;
 			}
 		}
-		sprintf(time, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
+		snprintf(buffer, len, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),  BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
 	}
 	else
-	sprintf(time, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
+	snprintf(buffer, len, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
 	
-	return(time);
+	return(buffer);
+}
+
+char* RV8803::stringTimestamp()
+{
+	static char time[14]; //Max of hh:mm:ss:HHXM with \0 terminator
+	return stringTimestamp(time, sizeof(time));
 }
 
 //Returns timestamp in ISO 8601 format (yyyy-mm-ddThh:mm:ss).
+char* RV8803::stringTime8601(char *buffer, size_t len)
+{
+	snprintf(buffer, len, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
+	return(buffer);
+}
+
 char* RV8803::stringTime8601()
 {
 	static char timeStamp[21]; //Max of yyyy-mm-ddThh:mm:ss with \0 terminator
-
-	sprintf(timeStamp, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
-	
-	return(timeStamp);
+	return stringTime8601(timeStamp, sizeof(timeStamp));
 }
 
 //Returns time in UNIX Epoch time format
