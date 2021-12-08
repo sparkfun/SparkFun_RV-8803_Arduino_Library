@@ -21,22 +21,23 @@
 
 RV8803 rtc;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
-  Serial.println("Alarm from RTC Example");
+  Serial.println("Tuning Example");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
-  }
-  else
+  if (rtc.begin() == false)
   {
-    Serial.println("RTC online!");
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while(1);
   }
+  Serial.println("RTC online!");
+
   rtc.setCalibrationOffset(0); //Zero out any calibration settings we may have
   rtc.setClockOutTimerFrequency(CLOCK_OUT_FREQUENCY_1_HZ); //Set our clockout to a 1 Hz square wave,
+
   //We now must measure the frequency on the Clock Out carefully to calibrate our crystal. To start generating a signal on Clock Out, tie CLKOE High.
   //Change measuredFrequency accordingly, note that you can only correct +/-7.6288 ppm
   float measuredFrequency = 1.0000012; //Measured frequency in Hz (CHANGE THIS TO YOUR MEASURED VALUE)
@@ -45,6 +46,7 @@ void setup() {
   
 }
 
-void loop() {
+void loop()
+{
   
 }

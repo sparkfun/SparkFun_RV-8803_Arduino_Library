@@ -12,7 +12,7 @@
 
   Hardware Connections:
     Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
-    If you are using an adapter cable, here is the wire color scheme: 
+    If you are using an adapter cable, here is the wire color scheme:
     Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
@@ -21,35 +21,35 @@
 
 RV8803 rtc;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Read Time from RTC Example");
 
-  if (rtc.begin() == false) {
+  if (rtc.begin() == false)
+  {
     Serial.println("Something went wrong, check wiring");
+    while(1);
+  }
+  Serial.println("RTC online!");
+}
+
+void loop()
+{
+  if (rtc.updateTime() == true) //Updates the time variables from RTC
+  {
+    String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
+    //String currentDate = rtc.stringDate(); //Get the current date in dd/mm/yyyy format
+    String currentTime = rtc.stringTime(); //Get the time
+    Serial.print(currentDate);
+    Serial.print(" ");
+    Serial.println(currentTime);
   }
   else
   {
-    Serial.println("RTC online!");
+    Serial.print("RTC read failed");
   }
-}
-
-void loop() {
-
-  if (rtc.updateTime() == false) //Updates the time variables from RTC
-  {
-    Serial.print("RTC failed to update");
-  }
-
-  String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
-  //String currentDate = rtc.stringDate(); //Get the current date in dd/mm/yyyy format
-  String currentTime = rtc.stringTime(); //Get the time
-  Serial.print(currentDate);
-  Serial.print(" ");
-  Serial.println(currentTime);
-
   delay(1000);
 }

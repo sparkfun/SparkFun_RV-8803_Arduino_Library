@@ -215,7 +215,7 @@ char* RV8803::stringTime8601()
 }
 
 //Returns time in UNIX Epoch time format
-uint32_t RV8803::getEpoch()
+uint32_t RV8803::getEpoch(bool use1970sEpoch)
 {
 	struct tm tm;
 
@@ -233,10 +233,13 @@ uint32_t RV8803::getEpoch()
 }
 
 //Sets time using UNIX Epoch time
-bool RV8803::setEpoch(uint32_t value)
+bool RV8803::setEpoch(uint32_t value, bool use1970sEpoch)
 {
-	if (value < 946684800) {
-		value = 946684800; // 2000-01-01 00:00:00
+	if(use1970sEpoch)
+	{
+	    // AVR GCC compiler sets the Epoch time to Jan 1st, 2000. We can 
+    	// reduce the offset from Jan 1st, 1970 if folks want that format
+		value -= 946710000;
 	}
 
 	time_t t = value;

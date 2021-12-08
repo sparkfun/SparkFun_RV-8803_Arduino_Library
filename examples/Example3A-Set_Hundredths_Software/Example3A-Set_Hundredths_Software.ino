@@ -12,7 +12,7 @@
 
   Hardware Connections:
     Plug the RTC into the Qwiic port on your microcontroller or on your Qwiic shield/adapter.
-    If you are using an adapter cable, here is the wire color scheme: 
+    If you are using an adapter cable, here is the wire color scheme:
     Black=GND, Red=3.3V, Blue=SDA, Yellow=SCL
     Open the serial monitor at 115200 baud
 */
@@ -21,27 +21,29 @@
 
 RV8803 rtc;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Set Hundredths to 0");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
-  }
-  else
+  if (rtc.begin() == false)
   {
-    Serial.println("RTC online!");
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while (1);
   }
+  Serial.println("RTC online!");
+
+  Serial.println("Press r to reset hundredths to zero");
 }
 
-void loop() {
-  if (Serial.available()) //The microcontroller waits for an 'r' to reset the hundredths register to :00
+void loop()
+{
+  if (Serial.available())
   {
-    char resetCharacter = Serial.read();
-    if (resetCharacter == 'r')
+    char incoming = Serial.read();
+    if (incoming == 'r') //The microcontroller waits for an 'r' to reset the hundredths register to :00
     {
       rtc.setHundredthsToZero(); //This function resets the hundredths register to :00. Note that you can call this function based on any event.
       rtc.updateTime(); //Grab time data from the RTC
@@ -50,4 +52,20 @@ void loop() {
       Serial.println(hundredths);
     }
   }
+
+  if (rtc.updateTime() == true) //Updates the time variables from RTC
+  {
+    String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
+    //String currentDate = rtc.stringDate(); //Get the current date in dd/mm/yyyy format
+    String currentTime = rtc.stringTime(); //Get the time
+    Serial.print(currentDate);
+    Serial.print(" ");
+    Serial.println(currentTime);
+  }
+  else
+  {
+    Serial.print("RTC read failed");
+  }
+
+  delay(1000);
 }

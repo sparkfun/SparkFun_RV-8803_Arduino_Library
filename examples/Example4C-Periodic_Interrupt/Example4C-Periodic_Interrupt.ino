@@ -23,35 +23,38 @@ RV8803 rtc;
 
 long lastInterruptTime;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Alarm from RTC Example");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
-  }
-  else
+  if (rtc.begin() == false)
   {
-    Serial.println("RTC online!");
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while(1);
   }
+  Serial.println("RTC online!");
   
   rtc.disableAllInterrupts();
   rtc.clearAllInterruptFlags();//Clear all flags in case any interrupts have occurred.
   rtc.setPeriodicTimeUpdateFrequency(TIME_UPDATE_1_SECOND); //Can also use TIME_UPDATE_1_MINUTE (TIME_UPDATE_1_SECOND = false, TIME_UPDATE_1_MINUTE = true)
   rtc.enableHardwareInterrupt(UPDATE_INTERRUPT); //The update interrupt needs to have the hardware interrupt enabled to function
+
   lastInterruptTime = millis();
 }
 
-void loop() {
+void loop()
+{
   if(rtc.getInterruptFlag(FLAG_UPDATE))
   {
     long timeSinceLastInterrupt = millis() - lastInterruptTime; 
     lastInterruptTime = millis(); 
+
     rtc.clearInterruptFlag(FLAG_UPDATE);
     //rtc.clearAllInterruptFlags(); // This can also be used, but beware as it will clear the entire flag register
+    
     Serial.print("Time between interrupts: ");
     Serial.print(timeSinceLastInterrupt); 
     Serial.println(" mS");

@@ -35,16 +35,19 @@ uint8_t dateAlarmValue = 0; //1-31
 #define WEEKDAY_ALARM_ENABLE false
 #define DATE_ALARM_ENABLE false
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Alarm from RTC Example");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
+  if (rtc.begin() == false)
+  {
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while(1);
   }
+  Serial.println("RTC online!");
 
   rtc.disableAllInterrupts();
   rtc.clearAllInterruptFlags();//Clear all flags in case any interrupts have occurred.
@@ -56,7 +59,8 @@ void setup() {
   rtc.enableHardwareInterrupt(ALARM_INTERRUPT); 
 }
 
-void loop() {
+void loop()
+{
   if (rtc.getInterruptFlag(FLAG_ALARM)) //Check if our Alarm flag is up
   {
     Serial.println("Alarm Triggered, clearing flag");
@@ -67,5 +71,6 @@ void loop() {
   {
     Serial.println("Waiting for alarm...");
   }
+
   delay(1000); //Wait 1 second to check again
 }

@@ -21,34 +21,36 @@
 
 RV8803 rtc;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Alarm from RTC Example");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
-  }
-  else
+  if (rtc.begin() == false)
   {
-    Serial.println("RTC online!");
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while(1);
   }
+  Serial.println("RTC online!");
   
-  rtc.setEVIEventCapture(ENABLE); //Enables the Timestamping function
+  rtc.setEVIEventCapture(RV8803_ENABLE); //Enables the Timestamping function
   rtc.setEVIDebounceTime(EVI_DEBOUNCE_256HZ); //Debounce the button with a 3.9 ms(256 Hz) sampling period, other options are EVI_DEBOUNCE_NONE, EVI_DEBOUNCE_64HZ, and EVI_DEBOUNCE_8HZ
   //rtc.setEVIEdgeDetection(RISING_EDGE); // Uncomment to set event detection to button release instead of press
 }
 
-void loop() {
+void loop()
+{
   if (rtc.getInterruptFlag(FLAG_EVI))
   {
     rtc.updateTime();
     rtc.clearInterruptFlag(FLAG_EVI);
+
     String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
     //String currentDate = rtc.stringDate(); //Uncomment this line to get the current date in dd/mm/yyyy format
     String timestamp = rtc.stringTimestamp();
+
     Serial.print(currentDate);
     Serial.print(" ");
     Serial.println(timestamp);

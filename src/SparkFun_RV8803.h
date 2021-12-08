@@ -163,7 +163,7 @@ public:
 		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
-	bool setEpoch(uint32_t value);
+	bool setEpoch(uint32_t value, bool use1970sEpoch = true);
 	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
 	bool setMinutes(uint8_t value);
@@ -183,7 +183,7 @@ public:
 	uint8_t getWeekday();
 	uint8_t getMonth();
 	uint16_t getYear();	
-	uint32_t getEpoch();
+	uint32_t getEpoch(bool use1970sEpoch = true);
 	
 	uint8_t getHundredthsCapture();
 	uint8_t getSecondsCapture();

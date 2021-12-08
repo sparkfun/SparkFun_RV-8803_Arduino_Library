@@ -23,16 +23,19 @@ RV8803 rtc;
 
 long lastInterruptTime = 0;
 
-void setup() {
-
+void setup()
+{
   Wire.begin();
 
   Serial.begin(115200);
   Serial.println("Alarm from RTC Example");
 
-  if (rtc.begin() == false) {
-    Serial.println("Something went wrong, check wiring");
+  if (rtc.begin() == false)
+  {
+    Serial.println("Device not found. Please check wiring. Freezing.");
+    while(1);
   }
+  Serial.println("RTC online!");
 
   //To configure a periodic interrupt, we'll need to do some math to figure out how to set our registers. We are able to change how many clock ticks we want to count (0-4095), and also the length of each clock tick. (4 options: 4096 Hz, 64 Hz, 1 Hz, 1/60 Hz)
   //The time ranges covered by each freqeuncy setting are as follows
@@ -53,13 +56,16 @@ void setup() {
   lastInterruptTime = millis(); //Change millis() to micros() if you end up using the 4096 Hz counter
 }
 
-void loop() {
+void loop()
+{
   if(rtc.getInterruptFlag(FLAG_TIMER))
   {
     long timeSinceLastInterrupt = millis() - lastInterruptTime; //Change millis() to micros() if you end up using the 4096 Hz counter
     lastInterruptTime = millis(); //Change millis() to micros() if you end up using the 4096 Hz counter
+
     rtc.clearInterruptFlag(FLAG_TIMER);
     //rtc.clearAllInterruptFlags(); // This can also be used, but beware as it will clear the entire flag register
+
     Serial.print("Time between interrupts: ");
     Serial.print(timeSinceLastInterrupt); 
     Serial.println(" mS");
