@@ -39,7 +39,7 @@ void setup() {
   //4096 Hz: 244.14 uS - .9998 Second;                            244.14 uS per LSB             COUNTDOWN_TIMER_FREQUENCY_4096_HZ
   //64 Hz: 15.625 mS - 63.984 Seconds;                            15.625 mS per LSB             COUNTDOWN_TIMER_FREQUENCY_64_HZ
   //1 Hz: 1 Second - 4095 Seconds (68 minutes 16 seconds);        1 Second per LSB              COUNTDOWN_TIMER_FREQUENCY_1_HZ
-  //1/60 Hz: 1 Minute = 4095 Minutes (68 hours 16 minutes)        1 Minute per LSB              COUNTDOWN_TIMER_FREQUENCY_1/60_HZ
+  //1/60 Hz: 1 Minute = 4095 Minutes (68 hours 16 minutes)        1 Minute per LSB              COUNTDOWN_TIMER_FREQUENCY_1_60TH_HZ
   //As an example, we'll configure a ~3.5 second interrupt. We'll choose 60 Hz as our frequency as we want something longer than 1 second, but still want enough granularity to fire an interrupt at 3.5 seconds, not 3 or 4.
   //Since the resolution for this setting is 15.625 mS per LSB, we'll convert 3.5 seconds to 3500 ms. We'll then simply divide the time we want by the resolution to get the number of clock ticks we need to wait to fire the interrupt
   //3500 / 15.625 = 224 Clock ticks

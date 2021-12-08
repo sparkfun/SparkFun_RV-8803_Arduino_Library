@@ -49,3 +49,6 @@ eagle.epf
 
 # file locks introduced since 7.x
 *.lck
+
+# VS Code c_cpp properties
+.vscode/c_cpp_properties.json
