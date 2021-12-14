@@ -39,6 +39,9 @@ void setup()
 
   // Set the RTC time using UNIX Epoch time
   rtc.setEpoch(1639007837); // E.g. https://www.epoch101.com/
+
+  // Set the RTC time using UNIX 1970s Epoch time. This subtracts 946710000 from the value before sending to RTC.
+  //rtc.setEpoch(2585717837, true); // E.g. https://www.epoch101.com/
 }
 
 void loop()

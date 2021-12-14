@@ -215,7 +215,7 @@ char* RV8803::stringTime8601()
 }
 
 //Returns time in UNIX Epoch time format
-uint32_t RV8803::getEpoch(bool use1970sEpoch)
+uint32_t RV8803::getEpoch()
 {
 	struct tm tm;
 
