@@ -45,9 +45,15 @@ void loop()
     String currentTime = rtc.stringTime8601();
     Serial.println(currentTime);
 
+    // Get the Epoch time - starting from Jan 1st 2000
+    unsigned long epochTime = rtc.getEpoch();
+
     // Get the UNIX Epoch time
-    unsigned long unixtime = rtc.getEpoch();
-    Serial.println(unixtime);
+    // Unix time starts at Jan 1st 1970 UTC (not Jan 1st 2000)
+    // https://www.unixtimestamp.com/
+    //unsigned long epochTime = rtc.getEpoch(true); // <- Set the use1970sEpoch parameter to true (default is false)
+    
+    Serial.println(epochTime);
   }
   else
   {

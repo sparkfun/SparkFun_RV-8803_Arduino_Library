@@ -37,20 +37,27 @@ void setup()
     Serial.println("RTC online!");
   }
 
-  // Set the RTC time using UNIX Epoch time
-  rtc.setEpoch(1639007837); // E.g. https://www.epoch101.com/
+  // Set the RTC time to Thursday, December 31, 2020 12:00:00 (GMT / UTC)
+  rtc.setEpoch(662731200);
 
-  // Set the RTC time using UNIX 1970s Epoch time. This subtracts 946710000 from the value before sending to RTC.
-  //rtc.setEpoch(2585717837, true); // E.g. https://www.epoch101.com/
+  // Set the RTC time using UNIX 1970s Epoch time.
+  // This subtracts 946684800 from the value before sending to RTC.
+  //rtc.setEpoch(1609416000, true); // E.g. https://www.epoch101.com/
 }
 
 void loop()
 {
   if (rtc.updateTime() == true) //Updates the time variables from RTC
   {
-    // Print the current UNIX Epoch time
-    unsigned long unixtime = rtc.getEpoch();
-    Serial.println(unixtime);
+    // Print the current Epoch
+    unsigned long epochTime = rtc.getEpoch();
+
+    // Print the current UNIX Epoch
+    // Unix time starts at Jan 1st 1970 UTC (not Jan 1st 2000)
+    // https://www.unixtimestamp.com/
+    //unsigned long epochTime = rtc.getEpoch(true); // <- Set the use1970sEpoch parameter to true (default is false)
+
+    Serial.println(epochTime);
 
     // Confirm the date and time using the ISO 8601 timestamp
     String currentTime = rtc.stringTime8601();
