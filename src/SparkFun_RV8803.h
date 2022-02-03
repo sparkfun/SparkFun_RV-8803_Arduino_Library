@@ -183,7 +183,7 @@ public:
 	uint8_t getWeekday();
 	uint8_t getMonth();
 	uint16_t getYear();	
-	uint32_t getEpoch();
+	uint32_t getEpoch(bool use1970sEpoch = false);
 	
 	uint8_t getHundredthsCapture();
 	uint8_t getSecondsCapture();
