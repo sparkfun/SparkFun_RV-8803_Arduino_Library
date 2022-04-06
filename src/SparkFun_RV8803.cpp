@@ -350,14 +350,14 @@ bool RV8803::updateTime()
 	if (readMultipleRegisters(RV8803_HUNDREDTHS, _time, TIME_ARRAY_LENGTH) == false)
 		return(false); //Something went wrong
 	
-	if (BCDtoDEC(_time[TIME_SECONDS]) == 59) //If seconds are at 59, read again to make sure we didn't accidentally skip a minute
+	if (BCDtoDEC(_time[TIME_HUNDREDTHS]) == 99 || BCDtoDEC(_time[TIME_SECONDS]) == 59) //If hundredths are at 99 or seconds are at 59, read again to make sure we didn't accidentally skip a second/minute
 	{	
 		uint8_t tempTime[TIME_ARRAY_LENGTH];
 		if (readMultipleRegisters(RV8803_HUNDREDTHS, tempTime, TIME_ARRAY_LENGTH) == false)
 		{
 			return(false); //Something went wrong
 		}
-		if (BCDtoDEC(tempTime[TIME_SECONDS]) == 0) //If the reading for seconds changed, then our new data is correct, otherwise, we can leave the old data.
+		if (BCDtoDEC(_time[TIME_HUNDREDTHS]) > BCDtoDEC(tempTime[TIME_HUNDREDTHS])) //If the reading for hundredths has rolled over, then our new data is correct, otherwise, we can leave the old data.
 		{
 			memcpy(_time, tempTime, TIME_ARRAY_LENGTH);
 		}
