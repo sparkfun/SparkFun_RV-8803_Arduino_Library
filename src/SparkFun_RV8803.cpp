@@ -266,7 +266,11 @@ bool RV8803::setTime(uint8_t* time, uint8_t len = 8)
     if (len != TIME_ARRAY_LENGTH)
         return false;
 
-    return writeMultipleRegisters(RV8803_SECONDS, time + 1, len - 1); // We use length - 1 as that is the length without the read-only hundredths register We also point to the second element in the time array as hundredths is read only
+    bool response = writeMultipleRegisters(RV8803_SECONDS, time + 1, len - 1); // We use length - 1 as that is the length without the read-only hundredths register We also point to the second element in the time array as hundredths is read only
+
+    writeBit(RV8803_CONTROL, CONTROL_RESET, RV8803_DISABLE); //Set RESET bit to 0 after setting time to make sure seconds don't get stuck.
+
+    return response; 
 }
 
 bool RV8803::setHundredthsToZero()
