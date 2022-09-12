@@ -14,8 +14,8 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#include "SparkFun_RV8803.h"
 #include <time.h>
+#include "SparkFun_RV8803.h"
 
 //****************************************************************************//
 //
