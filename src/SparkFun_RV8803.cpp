@@ -197,6 +197,209 @@ char* RV8803::stringTime8601()
     return stringTime8601(timeStamp, sizeof(timeStamp));
 }
 
+char* RV8803::stringDayOfWeek(char *buffer, size_t len)
+{
+    switch (getWeekday())
+    {
+        case 0:
+            snprintf(buffer, len, "Sunday");
+            return(buffer);
+            break;
+        case 1:
+            snprintf(buffer, len, "Monday");
+            return(buffer);
+            break;
+        case 2:
+            snprintf(buffer, len, "Tuesday");
+            return(buffer);
+            break;
+        case 3:
+            snprintf(buffer, len, "Wednesday");
+            return(buffer);
+            break;
+        case 4:
+            snprintf(buffer, len, "Thursday");
+            return(buffer);
+            break;
+        case 5:
+            snprintf(buffer, len, "Friday");
+            return(buffer);
+            break;
+        default:
+            snprintf(buffer, len, "Saturday");
+            return(buffer);
+            break;
+    }
+}
+char* RV8803::stringDayOfWeekShort(char *buffer, size_t len)
+{
+    switch (getWeekday())
+    {
+        case 0:
+            snprintf(buffer, len, "Sun");
+            return(buffer);
+            break;
+        case 1:
+            snprintf(buffer, len, "Mon");
+            return(buffer);
+            break;
+        case 2:
+            snprintf(buffer, len, "Tue");
+            return(buffer);
+            break;
+        case 3:
+            snprintf(buffer, len, "Wed");
+            return(buffer);
+            break;
+        case 4:
+            snprintf(buffer, len, "Thu");
+            return(buffer);
+            break;
+        case 5:
+            snprintf(buffer, len, "Fri");
+            return(buffer);
+            break;
+        default:
+            snprintf(buffer, len, "Sat");
+            return(buffer);
+            break;
+    }
+}
+char* RV8803::stringDateOrdinal(char *buffer, size_t len)
+{
+    switch (getDate())
+    {
+        case 1:
+        case 21:
+        case 31:
+            snprintf(buffer, len, "%dst", getDate());
+            return(buffer);
+            break;
+        case 2:
+        case 22:
+            snprintf(buffer, len, "%dnd", getDate());
+            return(buffer);
+            break;
+        case 3:
+        case 23:
+            snprintf(buffer, len, "%drd", getDate());
+            return(buffer);
+            break;
+        default:
+            snprintf(buffer, len, "%dth", getDate());
+            return(buffer);
+            break;
+    }
+}
+char* RV8803::stringMonth(char *buffer, size_t len)
+{
+    switch (getMonth())
+    {
+        case 1:
+            snprintf(buffer, len, "January");
+            return(buffer);
+            break;
+        case 2:
+            snprintf(buffer, len, "February");
+            return(buffer);
+            break;
+        case 3:
+            snprintf(buffer, len, "March");
+            return(buffer);
+            break;
+        case 4:
+            snprintf(buffer, len, "April");
+            return(buffer);
+            break;
+        case 5:
+            snprintf(buffer, len, "May");
+            return(buffer);
+            break;
+        case 6:
+            snprintf(buffer, len, "June");
+            return(buffer);
+            break;
+        case 7:
+            snprintf(buffer, len, "July");
+            return(buffer);
+            break;
+        case 8:
+            snprintf(buffer, len, "August");
+            return(buffer);
+            break;
+        case 9:
+            snprintf(buffer, len, "September");
+            return(buffer);
+            break;
+        case 10:
+            snprintf(buffer, len, "October");
+            return(buffer);
+            break;
+        case 11:
+            snprintf(buffer, len, "November");
+            return(buffer);
+            break;
+        default:
+            snprintf(buffer, len, "December");
+            return(buffer);
+            break;
+    }
+}
+char* RV8803::stringMonthShort(char *buffer, size_t len)
+{
+    switch (getMonth())
+    {
+        case 1:
+            snprintf(buffer, len, "Jan");
+            return(buffer);
+            break;
+        case 2:
+            snprintf(buffer, len, "Feb");
+            return(buffer);
+            break;
+        case 3:
+            snprintf(buffer, len, "Mar");
+            return(buffer);
+            break;
+        case 4:
+            snprintf(buffer, len, "Apr");
+            return(buffer);
+            break;
+        case 5:
+            snprintf(buffer, len, "May");
+            return(buffer);
+            break;
+        case 6:
+            snprintf(buffer, len, "Jun");
+            return(buffer);
+            break;
+        case 7:
+            snprintf(buffer, len, "Jul");
+            return(buffer);
+            break;
+        case 8:
+            snprintf(buffer, len, "Aug");
+            return(buffer);
+            break;
+        case 9:
+            snprintf(buffer, len, "Sep");
+            return(buffer);
+            break;
+        case 10:
+            snprintf(buffer, len, "Oct");
+            return(buffer);
+            break;
+        case 11:
+            snprintf(buffer, len, "Nov");
+            return(buffer);
+            break;
+        default:
+            snprintf(buffer, len, "Dec");
+            return(buffer);
+            break;
+    }
+}
+
 // Returns time in UNIX Epoch time format
 uint32_t RV8803::getEpoch(bool use1970sEpoch)
 {

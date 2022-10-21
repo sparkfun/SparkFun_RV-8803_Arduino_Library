@@ -160,6 +160,11 @@ public:
 	char* stringTimestamp(); //Return timestamp in hh:mm:ss:hh, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
 	char* stringTime8601(char *buffer, size_t len); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss in supplied buffer
 	char* stringTime8601(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss
+	char *stringDayOfWeek(char *buffer, size_t len); //Return the day of week in supplied buffer. Returns the full name
+	char *stringDayOfWeekShort(char *buffer, size_t len); //Return the day of week in supplied buffer. Returns "Sun", "Mon" etc
+	char *stringDateOrdinal(char *buffer, size_t len); //Return the ordinal for the date (day of month). Returns "1st", "2nd", "3rd", "4th" etc
+	char *stringMonth(char *buffer, size_t len); //Return the name of the month. Returns "January", etc
+	char *stringMonthShort(char *buffer, size_t len); //Return the name of the month (short). Returns "Jan", "Feb" etc
 		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
