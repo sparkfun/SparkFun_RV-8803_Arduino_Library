@@ -171,9 +171,11 @@ char* RV8803::stringTimestamp(char* buffer, size_t len)
                 twelveHourCorrection = 12;
             }
         }
-        snprintf(buffer, len, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
+        snprintf(buffer, len, "%02d:%02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_HOURS]) - twelveHourCorrection, BCDtoDEC(_time[TIME_MINUTES]),
+                                                        BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)), half);
     } else
-        snprintf(buffer, len, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
+        snprintf(buffer, len, "%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]),
+                                                     BCDtoDEC(readRegister(RV8803_SECONDS_CAPTURE)), BCDtoDEC(readRegister(RV8803_HUNDREDTHS_CAPTURE)));
 
     return (buffer);
 }
@@ -187,14 +189,40 @@ char* RV8803::stringTimestamp()
 // Returns timestamp in ISO 8601 format (yyyy-mm-ddThh:mm:ss).
 char* RV8803::stringTime8601(char* buffer, size_t len)
 {
-    snprintf(buffer, len, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
+    snprintf(buffer, len, "20%02d-%02d-%02dT%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]),
+                                                             BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
     return (buffer);
 }
 
 char* RV8803::stringTime8601()
 {
-    static char timeStamp[21]; // Max of yyyy-mm-ddThh:mm:ss with \0 terminator
-    return stringTime8601(timeStamp, sizeof(timeStamp));
+    static char time8601[21]; // Max of yyyy-mm-ddThh:mm:ss with \0 terminator
+    return stringTime8601(time8601, sizeof(time8601));
+}
+
+// Returns timestamp in ISO 8601 format (yyyy-mm-ddThh:mm:ss).
+char* RV8803::stringTime8601TZ(char* buffer, size_t len)
+{
+    int8_t quarterHours = getTimeZoneQuarterHours();
+    char plusMinus = '+';
+    if (quarterHours < 0)
+    {
+        plusMinus = '-';
+        quarterHours *= -1;
+    }
+    uint16_t mins = quarterHours * 15;
+    uint8_t tzh = mins / 60;
+    uint8_t tzm = mins % 60;
+    snprintf(buffer, len, "20%02d-%02d-%02dT%02d:%02d:%02d%c%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]),
+                                                             BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]),
+                                                             plusMinus, tzh, tzm);
+    return (buffer);
+}
+
+char* RV8803::stringTime8601TZ()
+{
+    static char time8601tz[27]; // Max of yyyy-mm-ddThh:mm:ss+hh:mm with \0 terminator
+    return stringTime8601(time8601tz, sizeof(time8601tz));
 }
 
 char* RV8803::stringDayOfWeek(char *buffer, size_t len)
@@ -231,6 +259,13 @@ char* RV8803::stringDayOfWeek(char *buffer, size_t len)
             break;
     }
 }
+
+char* RV8803::stringDayOfWeek()
+{
+    static char timeDOW[11]; // Max of day with \0 terminator
+    return stringDayOfWeek(timeDOW, sizeof(timeDOW));
+}
+
 char* RV8803::stringDayOfWeekShort(char *buffer, size_t len)
 {
     switch (getWeekday())
@@ -265,6 +300,13 @@ char* RV8803::stringDayOfWeekShort(char *buffer, size_t len)
             break;
     }
 }
+
+char* RV8803::stringDayOfWeekShort()
+{
+    static char timeDOWs[5]; // Max of day with \0 terminator
+    return stringDayOfWeekShort(timeDOWs, sizeof(timeDOWs));
+}
+
 char* RV8803::stringDateOrdinal(char *buffer, size_t len)
 {
     switch (getDate())
@@ -291,6 +333,13 @@ char* RV8803::stringDateOrdinal(char *buffer, size_t len)
             break;
     }
 }
+
+char* RV8803::stringDateOrdinal()
+{
+    static char timeOrdinal[6]; // Max of ordinal with \0 terminator
+    return stringTime8601(timeOrdinal, sizeof(timeOrdinal));
+}
+
 char* RV8803::stringMonth(char *buffer, size_t len)
 {
     switch (getMonth())
@@ -345,6 +394,13 @@ char* RV8803::stringMonth(char *buffer, size_t len)
             break;
     }
 }
+
+char* RV8803::stringMonth()
+{
+    static char timeMonth[11]; // Max of month with \0 terminator
+    return stringTime8601(timeMonth, sizeof(timeMonth));
+}
+
 char* RV8803::stringMonthShort(char *buffer, size_t len)
 {
     switch (getMonth())
@@ -400,6 +456,12 @@ char* RV8803::stringMonthShort(char *buffer, size_t len)
     }
 }
 
+char* RV8803::stringMonthShort()
+{
+    static char timeMonths[5]; // Max of month with \0 terminator
+    return stringTime8601(timeMonths, sizeof(timeMonths));
+}
+
 // Returns time in UNIX Epoch time format
 uint32_t RV8803::getEpoch(bool use1970sEpoch)
 {
@@ -427,13 +489,27 @@ uint32_t RV8803::getEpoch(bool use1970sEpoch)
 }
 
 // Sets time using UNIX Epoch time
-bool RV8803::setEpoch(uint32_t value, bool use1970sEpoch)
+bool RV8803::setEpoch(uint32_t value, bool use1970sEpoch, int8_t timeZoneQuarterHours)
 {
     if (use1970sEpoch) {
         // AVR GCC compiler sets the Epoch time to Jan 1st, 2000. We can
         // reduce the offset from Jan 1st, 1970 if folks want that format
         value -= 946684800;
     }
+
+    int32_t tzOffset = 0;
+
+    if (timeZoneQuarterHours != 0)
+    {
+        setTimeZoneQuarterHours(timeZoneQuarterHours); // Update timeZoneQuarterHours if desired
+        tzOffset = (int32_t)timeZoneQuarterHours * 15 * 60;
+    }
+    else
+    {
+        tzOffset = (int32_t)getTimeZoneQuarterHours() * 15 * 60;
+    }
+
+    value += tzOffset;
 
     time_t t = value;
     struct tm* tmp = gmtime(&t);
@@ -464,7 +540,7 @@ bool RV8803::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, ui
 }
 
 // Set time and date/day registers of RV8803 (using data array)
-bool RV8803::setTime(uint8_t* time, uint8_t len = 8)
+bool RV8803::setTime(uint8_t* time, uint8_t len)
 {
     if (len != TIME_ARRAY_LENGTH)
         return false;
@@ -953,3 +1029,28 @@ bool RV8803::readMultipleRegisters(uint8_t addr, uint8_t* dest, uint8_t len)
 
     return (true);
 }
+
+void RV8803::setTimeZoneQuarterHours(int8_t quarterHours)
+{
+    // Write the time zone to RV8803_RAM as int8_t (signed) in 15 minute increments
+    union
+    {
+        int8_t signed8;
+        uint8_t unsigned8;
+    } signedUnsigned8;
+    signedUnsigned8.signed8 = quarterHours;
+    writeRegister(RV8803_RAM, signedUnsigned8.unsigned8); // Store as uint8_t - without ambiguity
+}
+int8_t RV8803::getTimeZoneQuarterHours(void)
+{
+    // Read RV8803_RAM (int8_t (signed))
+    union
+    {
+        int8_t signed8;
+        uint8_t unsigned8;
+    } signedUnsigned8;
+    signedUnsigned8.unsigned8 = readRegister(RV8803_RAM); // Read as uint8_t
+    return signedUnsigned8.signed8; // Convert to int8_t - without ambiguity
+}
+
+
