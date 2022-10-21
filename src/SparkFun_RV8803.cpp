@@ -115,8 +115,8 @@ char* RV8803::stringDateUSA(char* buffer, size_t len)
 // Returns the date in MM/DD/YYYY format.
 char* RV8803::stringDateUSA()
 {
-    static char date[11]; // Max of mm/dd/yyyy with \0 terminator
-    return stringDateUSA(date, sizeof(date));
+    static char dateUSA[11]; // Max of mm/dd/yyyy with \0 terminator
+    return stringDateUSA(dateUSA, sizeof(dateUSA));
 }
 
 // Returns the date in the DD/MM/YYYY format.
@@ -182,8 +182,8 @@ char* RV8803::stringTimestamp(char* buffer, size_t len)
 
 char* RV8803::stringTimestamp()
 {
-    static char time[14]; // Max of hh:mm:ss:HHXM with \0 terminator
-    return stringTimestamp(time, sizeof(time));
+    static char timestamp[14]; // Max of hh:mm:ss:HHXM with \0 terminator
+    return stringTimestamp(timestamp, sizeof(timestamp));
 }
 
 // Returns timestamp in ISO 8601 format (yyyy-mm-ddThh:mm:ss).
@@ -222,7 +222,7 @@ char* RV8803::stringTime8601TZ(char* buffer, size_t len)
 char* RV8803::stringTime8601TZ()
 {
     static char time8601tz[27]; // Max of yyyy-mm-ddThh:mm:ss+hh:mm with \0 terminator
-    return stringTime8601(time8601tz, sizeof(time8601tz));
+    return stringTime8601TZ(time8601tz, sizeof(time8601tz));
 }
 
 char* RV8803::stringDayOfWeek(char *buffer, size_t len)
@@ -337,7 +337,7 @@ char* RV8803::stringDateOrdinal(char *buffer, size_t len)
 char* RV8803::stringDateOrdinal()
 {
     static char timeOrdinal[6]; // Max of ordinal with \0 terminator
-    return stringTime8601(timeOrdinal, sizeof(timeOrdinal));
+    return stringDateOrdinal(timeOrdinal, sizeof(timeOrdinal));
 }
 
 char* RV8803::stringMonth(char *buffer, size_t len)
@@ -398,7 +398,7 @@ char* RV8803::stringMonth(char *buffer, size_t len)
 char* RV8803::stringMonth()
 {
     static char timeMonth[11]; // Max of month with \0 terminator
-    return stringTime8601(timeMonth, sizeof(timeMonth));
+    return stringMonth(timeMonth, sizeof(timeMonth));
 }
 
 char* RV8803::stringMonthShort(char *buffer, size_t len)
@@ -459,11 +459,23 @@ char* RV8803::stringMonthShort(char *buffer, size_t len)
 char* RV8803::stringMonthShort()
 {
     static char timeMonths[5]; // Max of month with \0 terminator
-    return stringTime8601(timeMonths, sizeof(timeMonths));
+    return stringMonthShort(timeMonths, sizeof(timeMonths));
 }
 
-// Returns time in UNIX Epoch time format
+// Returns time in UNIX Epoch time format, adjusting for the time zone
 uint32_t RV8803::getEpoch(bool use1970sEpoch)
+{
+    uint32_t localEpoch = getLocalEpoch(use1970sEpoch);
+
+    int32_t tzOffset = (int32_t)getTimeZoneQuarterHours() * 15 * 60;
+
+    localEpoch -= tzOffset;
+
+    return localEpoch;
+}
+
+// Returns local time in UNIX Epoch time format
+uint32_t RV8803::getLocalEpoch(bool use1970sEpoch)
 {
     struct tm tm;
 
@@ -510,6 +522,28 @@ bool RV8803::setEpoch(uint32_t value, bool use1970sEpoch, int8_t timeZoneQuarter
     }
 
     value += tzOffset;
+
+    time_t t = value;
+    struct tm* tmp = gmtime(&t);
+
+    _time[TIME_SECONDS] = DECtoBCD(tmp->tm_sec);
+    _time[TIME_MINUTES] = DECtoBCD(tmp->tm_min);
+    _time[TIME_HOURS] = DECtoBCD(tmp->tm_hour);
+    _time[TIME_DATE] = DECtoBCD(tmp->tm_mday);
+    _time[TIME_WEEKDAY] = 1 << tmp->tm_wday;
+    _time[TIME_MONTH] = DECtoBCD(tmp->tm_mon + 1);
+    _time[TIME_YEAR] = DECtoBCD(tmp->tm_year - 100);
+
+    return setTime(_time, TIME_ARRAY_LENGTH); // Subtract one as we don't write to the hundredths register
+}
+
+bool RV8803::setLocalEpoch(uint32_t value, bool use1970sEpoch)
+{
+    if (use1970sEpoch) {
+        // AVR GCC compiler sets the Epoch time to Jan 1st, 2000. We can
+        // reduce the offset from Jan 1st, 1970 if folks want that format
+        value -= 946684800;
+    }
 
     time_t t = value;
     struct tm* tmp = gmtime(&t);
