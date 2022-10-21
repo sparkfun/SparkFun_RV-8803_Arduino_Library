@@ -22,6 +22,11 @@ stringDate	KEYWORD2
 stringTime	KEYWORD2
 stringTimeStamp	KEYWORD2
 stringTime8601	KEYWORD2
+stringDayOfWeek	KEYWORD2
+stringDayOfWeekShort	KEYWORD2
+stringDateOrdinal	KEYWORD2
+stringMonth
+stringMonthShort
 
 setTime	KEYWORD2
 setHundredthsToZero	KEYWORD2
