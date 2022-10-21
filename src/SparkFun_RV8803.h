@@ -160,15 +160,23 @@ public:
 	char* stringTimestamp(); //Return timestamp in hh:mm:ss:hh, note that this must be read the same minute that the timestamp occurs or the minute will be wrong
 	char* stringTime8601(char *buffer, size_t len); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss in supplied buffer
 	char* stringTime8601(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss
+	char* stringTime8601TZ(char *buffer, size_t len); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss+/-hh:mm in supplied buffer
+	char* stringTime8601TZ(); //Return time in ISO 8601 format yyyy-mm-ddThh:mm:ss+/-hh:mm
 	char *stringDayOfWeek(char *buffer, size_t len); //Return the day of week in supplied buffer. Returns the full name
+	char *stringDayOfWeek(); //Return the day of week. Returns the full name
 	char *stringDayOfWeekShort(char *buffer, size_t len); //Return the day of week in supplied buffer. Returns "Sun", "Mon" etc
+	char *stringDayOfWeekShort(); //Return the day of week. Returns "Sun", "Mon" etc
 	char *stringDateOrdinal(char *buffer, size_t len); //Return the ordinal for the date (day of month). Returns "1st", "2nd", "3rd", "4th" etc
+	char *stringDateOrdinal(); //Return the ordinal for the date (day of month). Returns "1st", "2nd", "3rd", "4th" etc
 	char *stringMonth(char *buffer, size_t len); //Return the name of the month. Returns "January", etc
+	char *stringMonth(); //Return the name of the month. Returns "January", etc
 	char *stringMonthShort(char *buffer, size_t len); //Return the name of the month (short). Returns "Jan", "Feb" etc
+	char *stringMonthShort(); //Return the name of the month (short). Returns "Jan", "Feb" etc
 		
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
-	bool setTime(uint8_t * time, uint8_t len);
-	bool setEpoch(uint32_t value, bool use1970sEpoch = false);
+	bool setTime(uint8_t * time, uint8_t len = TIME_ARRAY_LENGTH);
+	bool setEpoch(uint32_t value, bool use1970sEpoch = false, int8_t timeZoneQuarterHours = 0); // If timeZoneQuarterHours is non-zero, update RV8803_RAM. Add the zone to the epoch before setting
+	bool setLocalEpoch(uint32_t value, bool use1970sEpoch = false); // Set the local epoch - without adding the time zone
 	bool setHundredthsToZero();
 	bool setSeconds(uint8_t value);
 	bool setMinutes(uint8_t value);
@@ -177,6 +185,8 @@ public:
 	bool setWeekday(uint8_t value);
 	bool setMonth(uint8_t value);
 	bool setYear(uint16_t value);
+	void setTimeZoneQuarterHours(int8_t quarterHours); // Write the time zone to RV8803_RAM as int8_t (signed) in 15 minute increments
+	int8_t getTimeZoneQuarterHours(void); // Read RV8803_RAM (int8_t (signed))
 
 	bool updateTime(); //Update the local array with the RTC registers
 
@@ -188,7 +198,8 @@ public:
 	uint8_t getWeekday();
 	uint8_t getMonth();
 	uint16_t getYear();	
-	uint32_t getEpoch(bool use1970sEpoch = false);
+	uint32_t getEpoch(bool use1970sEpoch = false); // Get the epoch - with the time zone subtracted (i.e. return UTC epoch)
+	uint32_t getLocalEpoch(bool use1970sEpoch = false); // Get the local epoch - without subtracting the time zone
 	
 	uint8_t getHundredthsCapture();
 	uint8_t getSecondsCapture();
