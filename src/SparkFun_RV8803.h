@@ -27,6 +27,7 @@ Distributed as-is; no warranty is given.
 #endif
 
 #include <Wire.h>
+#include <time.h>
 
 //The 7-bit I2C address of the RV8803
 #define RV8803_ADDR							0x32
@@ -264,6 +265,12 @@ public:
 	bool writeRegister(uint8_t addr, uint8_t val);
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);
 	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
+
+	// When converting from a UTC based struct tm to a time_t value, you would normally use a utc
+	// version of mktime - timegm(), but we don't have that on most micro controllers - so use 
+	// the following. 
+	static time_t sub_mkgmt(struct tm *tm, bool use1970sEpoch);
+	time_t _timegm(struct tm *tm, bool use1970sEpoch);
 
   private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
