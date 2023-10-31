@@ -84,8 +84,8 @@ Distributed as-is; no warranty is given.
  * conversion exists....
  */
 
-#define EPOCH_YEAR      1970
-#define TM_YEAR_BASE    1900
+#define SFE_RV8803_EPOCH_YEAR      1970
+#define SFE_RV8803_TM_YEAR_BASE    1900
 
 static time_t
 sub_mkgmt(struct tm *tm)
@@ -106,13 +106,13 @@ sub_mkgmt(struct tm *tm)
     /* minimal sanity checking not to access outside of the array */
     if ((unsigned) tm->tm_mon >= 12)
         return (time_t) -1;
-    if (tm->tm_year < EPOCH_YEAR - TM_YEAR_BASE)
+    if (tm->tm_year < SFE_RV8803_EPOCH_YEAR - SFE_RV8803_TM_YEAR_BASE)
         return (time_t) -1;
 
-    y = tm->tm_year + TM_YEAR_BASE - (tm->tm_mon < 2);
+    y = tm->tm_year + SFE_RV8803_TM_YEAR_BASE - (tm->tm_mon < 2);
     nleapdays = y / 4 - y / 100 + y / 400 -
-        ((EPOCH_YEAR-1) / 4 - (EPOCH_YEAR-1) / 100 + (EPOCH_YEAR-1) / 400);
-    t = ((((time_t) (tm->tm_year - (EPOCH_YEAR - TM_YEAR_BASE)) * 365 +
+        ((SFE_RV8803_EPOCH_YEAR-1) / 4 - (SFE_RV8803_EPOCH_YEAR-1) / 100 + (SFE_RV8803_EPOCH_YEAR-1) / 400);
+    t = ((((time_t) (tm->tm_year - (SFE_RV8803_EPOCH_YEAR - SFE_RV8803_TM_YEAR_BASE)) * 365 +
             moff[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * 24 +
         tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
 
