@@ -485,7 +485,7 @@ uint32_t RV8803::getEpoch(bool use1970sEpoch)
     // Call our internal version of timegm() (some systems don't have this)
     // to get the value from our clock, without taking into the systems TimeZone.
 
-    time_t t = _timegm(&tm);
+    time_t t = _timegm(&tm, use1970sEpoch);
 
     // If the user has added any timezone info, roll that in.
 
@@ -1140,11 +1140,13 @@ int8_t RV8803::getTimeZoneQuarterHours(void)
  * conversion exists....
  */
 
-#define SFE_RV8803_EPOCH_YEAR      1970
-#define SFE_RV8803_TM_YEAR_BASE    1900
+#define SFE_RV8803_EPOCH_YEAR_1970  1970
+#define SFE_RV8803_EPOCH_YEAR_2000  2000
+#define SFE_RV8803_TM_YEAR_BASE     1900
 
-time_t RV8803::sub_mkgmt(struct tm *tm)
+time_t RV8803::sub_mkgmt(struct tm *tm, bool use1970sEpoch)
 {
+    int epoch_year = use1970sEpoch ? SFE_RV8803_EPOCH_YEAR_2000 : SFE_RV8803_EPOCH_YEAR_1970; // The logic is weirdly inverted...
     int y, nleapdays;
     time_t t;
     /* days before the month */
@@ -1161,34 +1163,34 @@ time_t RV8803::sub_mkgmt(struct tm *tm)
     /* minimal sanity checking not to access outside of the array */
     if ((unsigned) tm->tm_mon >= 12)
         return (time_t) -1;
-    if (tm->tm_year < SFE_RV8803_EPOCH_YEAR - SFE_RV8803_TM_YEAR_BASE)
+    if (tm->tm_year < epoch_year - SFE_RV8803_TM_YEAR_BASE)
         return (time_t) -1;
 
     y = tm->tm_year + SFE_RV8803_TM_YEAR_BASE - (tm->tm_mon < 2);
     nleapdays = y / 4 - y / 100 + y / 400 -
-        ((SFE_RV8803_EPOCH_YEAR-1) / 4 - (SFE_RV8803_EPOCH_YEAR-1) / 100 + (SFE_RV8803_EPOCH_YEAR-1) / 400);
-    t = ((((time_t) (tm->tm_year - (SFE_RV8803_EPOCH_YEAR - SFE_RV8803_TM_YEAR_BASE)) * 365 +
+        ((epoch_year-1) / 4 - (epoch_year-1) / 100 + (epoch_year-1) / 400);
+    t = ((((time_t) (tm->tm_year - (epoch_year - SFE_RV8803_TM_YEAR_BASE)) * 365 +
             moff[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * 24 +
         tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
 
     return (t < 0 ? (time_t) -1 : t);
 }
 
-time_t RV8803::_timegm(struct tm *tm)
+time_t RV8803::_timegm(struct tm *tm, bool use1970sEpoch)
 {
     time_t t, t2;
     struct tm *tm2;
     int sec;
 
     /* Do the first guess. */
-    if ((t = sub_mkgmt(tm)) == (time_t) -1)
+    if ((t = sub_mkgmt(tm, use1970sEpoch)) == (time_t) -1)
         return (time_t) -1;
 
     /* save value in case *tm is overwritten by gmtime() */
     sec = tm->tm_sec;
 
     tm2 = gmtime(&t);
-    if ((t2 = sub_mkgmt(tm2)) == (time_t) -1)
+    if ((t2 = sub_mkgmt(tm2, use1970sEpoch)) == (time_t) -1)
         return (time_t) -1;
 
     if (t2 < t || tm2->tm_sec != sec) {

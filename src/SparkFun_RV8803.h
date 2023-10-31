@@ -269,8 +269,8 @@ public:
 	// When converting from a UTC based struct tm to a time_t value, you would normally use a utc
 	// version of mktime - timegm(), but we don't have that on most micro controllers - so use 
 	// the following. 
-	static time_t sub_mkgmt(struct tm *tm);
-	time_t _timegm(struct tm *tm);
+	static time_t sub_mkgmt(struct tm *tm, bool use1970sEpoch);
+	time_t _timegm(struct tm *tm, bool use1970sEpoch);
 
   private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
