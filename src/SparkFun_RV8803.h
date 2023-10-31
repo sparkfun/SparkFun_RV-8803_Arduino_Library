@@ -27,6 +27,7 @@ Distributed as-is; no warranty is given.
 #endif
 
 #include <Wire.h>
+#include <Time.h>
 
 //The 7-bit I2C address of the RV8803
 #define RV8803_ADDR							0x32
