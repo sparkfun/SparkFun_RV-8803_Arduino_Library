@@ -265,6 +265,12 @@ public:
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);
 	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
 
+	// When converting from a UTC based struct tm to a time_t value, you would normally use a utc
+	// version of mktime - timegm(), but we don't have that on most micro controllers - so use 
+	// the following. 
+	static time_t sub_mkgmt(struct tm *tm);
+	time_t _timegm(struct tm *tm);
+
   private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	bool _isTwelveHour = true;
