@@ -472,7 +472,7 @@ uint32_t RV8803::getEpoch(bool use1970sEpoch)
 
     struct tm tm;
 
-    tm.tm_isdst = -1;
+    tm.tm_isdst = 0;
     tm.tm_yday = 0;
     tm.tm_wday = 0;
     tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
