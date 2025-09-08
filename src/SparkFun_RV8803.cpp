@@ -766,7 +766,7 @@ bool RV8803::setToCompilerTime()
     uint16_t d = BUILD_DATE;
     uint16_t m = BUILD_MONTH;
     uint16_t y = BUILD_YEAR;
-    uint16_t weekday = (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7 + 1;
+    uint16_t weekday = (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7;
     _time[TIME_WEEKDAY] = 1 << weekday;
 
     return setTime(_time, TIME_ARRAY_LENGTH);
